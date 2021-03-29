@@ -3,21 +3,14 @@ import java.util.Comparator;
 import java.util.Scanner;
 
 class ContinuousBackpack {
-    public static void main(String[] args) {
-        ContinuousBackpack task = new ContinuousBackpack();
-        task.run();
+    private int weightBag;
+    private final Item[] items;
+    public ContinuousBackpack(int weightBag, Item[] items) {
+        this.weightBag = weightBag;
+        this.items = items;
     }
-    public void run(){
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Введите количество элементов: ");
-        int amount = sc.nextInt();
-        Item [] items = new Item [amount];
-        for (int i = 0; i < amount; i++){
-            System.out.print("Введите цену, вес предмета №" + (i+ 1) + "\n");
-            int cost = sc.nextInt();
-            int weight = sc.nextInt();
-            items[i] = new Item(cost, weight);
-        }
+
+    public Item[] run(){
         Arrays.sort(items, new Comparator<Item>() {
             @Override
             public int compare(Item o1, Item o2) {
@@ -32,32 +25,43 @@ class ContinuousBackpack {
                 return 0;
             }
         });
-        System.out.print("Введите размер рюкзака: ");
-        int W = sc.nextInt();
         double result = 0;
-        for(Item item : items){
-            if(item.getWeight() <= W){
-                result += item.getCost();
-                W -= item.getWeight();
+        Item[] itemsBefore = new Item[items.length];
+        int resultWeight = 0;
+        for(int i = 0; i < items.length; i++){
+            if(items[i].getWeight() <= weightBag){
+                result += items[i].getCost();
+                weightBag -= items[i].getWeight();
+                itemsBefore[i] = new Item(items[i].getName(), items[i].getCost(), items[i].getWeight());
+                resultWeight += items[i].getWeight();
             }
             else{
-                result += (double) item.getCost() * W / item.getWeight();
+                result += (double) items[i].getCost() * weightBag / items[i].getWeight();
+                if (weightBag < 0) weightBag = 0;
+                itemsBefore[i] = new Item(
+                        items[i].getName(),
+                        items[i].getCost() * weightBag / items[i].getWeight(),
+                        (int)((double) weightBag / items[i].getWeight()) * 100);
+                System.out.print(((double) weightBag / items[i].getWeight()) * 100 + "\n");
+                weightBag -= (int) ((double) weightBag / items[i].getWeight()) * 100;
             }
         }
-        for (int i = 0; i < amount; i++){
-            System.out.print(items[i] + "\n");
+        for (Item item : items) {
+            System.out.print(item + "\n");
         }
-        System.out.print("Максимальня стоимость - " + result);
+        System.out.print("Максимальня стоимость - " + result + " Максимальный вес - " + resultWeight);
+        return itemsBefore;
     }
 }
 
 class Item{
     private final int cost;
     private final int weight;
-
-    public Item(int cost, int weight) {
+    private final String name;
+    public Item(String name, int cost, int weight) {
         this.cost = cost;
         this.weight = weight;
+        this.name = name;
     }
 
     @Override
@@ -74,5 +78,9 @@ class Item{
 
     public int getWeight() {
         return weight;
+    }
+
+    public String getName() {
+        return name;
     }
 }

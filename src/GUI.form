@@ -31,7 +31,7 @@
                   <gridbag weightx="1.0" weighty="1.0"/>
                 </constraints>
                 <properties>
-                  <text value="Button"/>
+                  <text value="Добавить предмет"/>
                 </properties>
               </component>
               <component id="feca1" class="javax.swing.JTextField" binding="weightInput">

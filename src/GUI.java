@@ -50,7 +50,30 @@ public class GUI extends JFrame {
                 model.addRow(new Object[]{nameInput.getText(), costInput.getText(), weightInput.getText()});
             }
         });
+        resultButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultTableModel model = (DefaultTableModel) tableItemsAfter.getModel();
+                Item[] items = new Item[model.getRowCount()];
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    String name = model.getValueAt(i, 0).toString();
+                    String cost = model.getValueAt(i, 1).toString();
+                    String weight = model.getValueAt(i, 2).toString();
+                    int costNew = Integer.parseInt(cost);
+                    int weightNew = Integer.parseInt(weight);
+                    items[i] = new Item(name, costNew, weightNew);
+                }
+                int weightBackpack = Integer.parseInt(weightBag.getText());
+                ContinuousBackpack bag = new ContinuousBackpack(weightBackpack, items);
+                Item[] itemsBefore = bag.run();
+                DefaultTableModel modelTableBefore = (DefaultTableModel) tableItemsBefore.getModel();
+                for (Item item : itemsBefore) {
+                    modelTableBefore.addRow(new Object[]{item.getName(), item.getCost(), item.getWeight()});
+                }
+            }
+        });
     }
+
     private void createUIComponents() {
         DefaultTableModel model = new DefaultTableModel();
         tableItemsAfter = new JTable(model);
@@ -99,7 +122,7 @@ public class GUI extends JFrame {
         panelEnters.add(panelItem, gbc);
         panelItem.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         addItemButton = new JButton();
-        addItemButton.setText("Button");
+        addItemButton.setText("Добавить предмет");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 4;
