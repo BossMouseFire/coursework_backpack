@@ -35,19 +35,6 @@ class ContinuousBackpack {
                 itemsBefore[i] = new Item(items[i].getName(), items[i].getCost(), items[i].getWeight());
                 resultWeight += items[i].getWeight();
             }
-            else{
-                result += (double) items[i].getCost() * weightBag / items[i].getWeight();
-                if (weightBag < 0) weightBag = 0;
-                itemsBefore[i] = new Item(
-                        items[i].getName(),
-                        items[i].getCost() * weightBag / items[i].getWeight(),
-                        (int)((double) weightBag / items[i].getWeight()) * 100);
-                System.out.print(((double) weightBag / items[i].getWeight()) * 100 + "\n");
-                weightBag -= (int) ((double) weightBag / items[i].getWeight()) * 100;
-            }
-        }
-        for (Item item : items) {
-            System.out.print(item + "\n");
         }
         System.out.print("Максимальня стоимость - " + result + " Максимальный вес - " + resultWeight);
         return itemsBefore;
