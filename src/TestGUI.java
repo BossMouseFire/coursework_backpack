@@ -9,7 +9,6 @@ public class TestGUI extends JFrame {
     private int columnTable = 2;
     public TestGUI(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        table.setDefaultRenderer(Object.class, new TableInfoRenderer());
         int amountSub = 5;
         int weight = 40;
         Item[] items = new Item[amountSub];

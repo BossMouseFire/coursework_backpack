@@ -1,17 +1,11 @@
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.plaf.FontUIResource;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.StyleContext;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Locale;
+import java.util.ArrayList;
 
 public class GUI extends JFrame {
     private JPanel mainPanelGUI;
-    private JTable tableItemsAfter;
-    private JTable tableItemsBefore;
     private JButton addItemButton;
     private JTextField weightInput;
     private JTextField costInput;
@@ -26,288 +20,92 @@ public class GUI extends JFrame {
     private JLabel labelItem;
     private JPanel panelBag;
     private JLabel labelWeightBag;
-    private JLabel maxWeight;
-    private JLabel maxCost;
-    private JPanel panelTables;
-    private JLabel labelResultData;
-    private JLabel labelDefaultData;
     private JButton clearTable;
     private JButton importItems;
     private JButton aboutPrograms;
+    private JPanel panelData;
+    private JPanel panelAfterItems;
+    private JPanel panelBeforeItems;
+    private JTable tableBeforeTable;
+
+    private final ArrayList<Item> items;
 
     public GUI() {
         super("Backpack project");
 
         $$$setupUI$$$();
         this.setBounds(350, 100, 1100, 500);
-        setupUI();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(mainPanelGUI);
         this.pack();
+        items = new ArrayList<>();
         addItemButton.addActionListener(e -> {
-            DefaultTableModel model = (DefaultTableModel) tableItemsAfter.getModel();
+            DefaultTableModel model = (DefaultTableModel) tableBeforeTable.getModel();
+            System.out.print(Integer.parseInt(costInput.getText()));
+            items.add(new Item(nameInput.getText(), Integer.parseInt(costInput.getText()), Integer.parseInt(weightInput.getText())));
+
             model.addRow(new Object[]{nameInput.getText(), costInput.getText(), weightInput.getText()});
         });
         resultButton.addActionListener(e -> {
-            DefaultTableModel model = (DefaultTableModel) tableItemsAfter.getModel();
-            Item[] items = new Item[model.getRowCount()];
-            for (int i = 0; i < model.getRowCount(); i++) {
-                String name = model.getValueAt(i, 0).toString();
-                String cost = model.getValueAt(i, 1).toString();
-                String weight = model.getValueAt(i, 2).toString();
-                int costNew = Integer.parseInt(cost);
-                int weightNew = Integer.parseInt(weight);
-                items[i] = new Item(name, costNew, weightNew);
+            panelBeforeItems.removeAll();
+            DefaultTableModel model = (DefaultTableModel) tableBeforeTable.getModel();
+            JTable table = new JTable(model);
+
+            model.addColumn("Вес / Вес товара");
+            model.addColumn("");
+
+            for (Item item : items) {
+                model.addColumn(item.getWeight());
             }
-            int weightBackpack = Integer.parseInt(weightBag.getText());
-            ContinuousBackpack bag = new ContinuousBackpack(weightBackpack, items);
-            Item[] itemsBefore = bag.run();
-            DefaultTableModel modelTableBefore = (DefaultTableModel) tableItemsBefore.getModel();
-            for (Item item : itemsBefore) {
-                modelTableBefore.addRow(new Object[]{item.getName(), String.format("%.3f", item.getCost()), item.getWeight()});
+            for (int i = 0; i <= Integer.parseInt(weightBag.getText()); i++) {
+                model.addRow(new Object[]{i});
             }
+            for (int row = 0; row <= Integer.parseInt(weightBag.getText()); row++) {
+                table.getModel().setValueAt(0, row, 1);
+            }
+            for (int column = 1; column <= items.size() + 1; column++) {
+                table.getModel().setValueAt(0, 0, column);
+            }
+            JScrollPane scrollPane = new JScrollPane(table);
+            GridBagConstraints gbc;
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.weightx = 1.0;
+            gbc.weighty = 1.0;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            panelBeforeItems.add(scrollPane);
+            panelBeforeItems.repaint();
+            panelBeforeItems.revalidate();
+
         });
+//        resultButton.addActionListener(e -> {
+//            DefaultTableModel model = (DefaultTableModel) tableItemsAfter.getModel();
+//            Item[] items = new Item[model.getRowCount()];
+//            for (int i = 0; i < model.getRowCount(); i++) {
+//                String name = model.getValueAt(i, 0).toString();
+//                String cost = model.getValueAt(i, 1).toString();
+//                String weight = model.getValueAt(i, 2).toString();
+//                int costNew = Integer.parseInt(cost);
+//                int weightNew = Integer.parseInt(weight);
+//                items[i] = new Item(name, costNew, weightNew);
+//            }
+//            int weightBackpack = Integer.parseInt(weightBag.getText());
+//            ContinuousBackpack bag = new ContinuousBackpack(weightBackpack, items);
+//            Item[] itemsBefore = bag.run();
+//            DefaultTableModel modelTableBefore = (DefaultTableModel) tableItemsBefore.getModel();
+//            for (Item item : itemsBefore) {
+//                modelTableBefore.addRow(new Object[]{item.getName(), String.format("%.3f", item.getCost()), item.getWeight()});
+//            }
+//        });
     }
 
     private void createUIComponents() {
-        DefaultTableModel model = new DefaultTableModel();
-        tableItemsAfter = new JTable(model);
-        model.addColumn("Название");
-        model.addColumn("Цена");
-        model.addColumn("Вес");
-
         DefaultTableModel modelBefore = new DefaultTableModel();
-        tableItemsBefore = new JTable(modelBefore);
+        tableBeforeTable = new JTable(modelBefore);
         modelBefore.addColumn("Название");
         modelBefore.addColumn("Цена");
         modelBefore.addColumn("Вес");
-    }
-
-    /**
-     * Method generated by IntelliJ IDEA GUI Designer
-     * >>> IMPORTANT!! <<<
-     * DO NOT edit this method OR call it in your code!
-     *
-     * @noinspection ALL
-     */
-    private void setupUI() {
-        createUIComponents();
-        mainPanelGUI = new JPanel();
-        mainPanelGUI.setLayout(new GridBagLayout());
-        panelEnters = new JPanel();
-        panelEnters.setLayout(new GridBagLayout());
-        GridBagConstraints gbc;
-        gbc = new GridBagConstraints();
-        gbc.gridx = 3;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(10, 5, 10, 10);
-        mainPanelGUI.add(panelEnters, gbc);
-        panelItem = new JPanel();
-        panelItem.setLayout(new GridBagLayout());
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(5, 0, 0, 0);
-        panelEnters.add(panelItem, gbc);
-        panelItem.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-        addItemButton = new JButton();
-        addItemButton.setText("Добавить предмет");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panelItem.add(addItemButton, gbc);
-        weightInput = new JTextField();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panelItem.add(weightInput, gbc);
-        labelWeight = new JLabel();
-        labelWeight.setText("Вес");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        panelItem.add(labelWeight, gbc);
-        costInput = new JTextField();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panelItem.add(costInput, gbc);
-        labelCost = new JLabel();
-        labelCost.setText("Цена");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        panelItem.add(labelCost, gbc);
-        nameInput = new JTextField();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panelItem.add(nameInput, gbc);
-        labelName = new JLabel();
-        labelName.setText("Название");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        panelItem.add(labelName, gbc);
-        labelItem = new JLabel();
-        labelItem.setText("Предмет");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        panelItem.add(labelItem, gbc);
-        panelBag = new JPanel();
-        panelBag.setLayout(new GridBagLayout());
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        panelEnters.add(panelBag, gbc);
-        panelBag.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-        resultButton = new JButton();
-        resultButton.setText("Результат");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panelBag.add(resultButton, gbc);
-        weightBag = new JTextField();
-        weightBag.setText("");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panelBag.add(weightBag, gbc);
-        labelWeightBag = new JLabel();
-        labelWeightBag.setText("Максимальный вес рюкзака");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        panelBag.add(labelWeightBag, gbc);
-        panelTables = new JPanel();
-        panelTables.setLayout(new GridBagLayout());
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 3;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(10, 10, 10, 0);
-        mainPanelGUI.add(panelTables, gbc);
-        panelTables.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, this.$$$getFont$$$(null, -1, -1, panelTables.getFont()), null));
-        final JScrollPane scrollPane1 = new JScrollPane();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        panelTables.add(scrollPane1, gbc);
-        scrollPane1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-        scrollPane1.setViewportView(tableItemsAfter);
-        final JScrollPane scrollPane2 = new JScrollPane();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        panelTables.add(scrollPane2, gbc);
-        scrollPane2.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-        scrollPane2.setViewportView(tableItemsBefore);
-        maxWeight = new JLabel();
-        maxWeight.setText("Вес");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.weightx = 1.0;
-        panelTables.add(maxWeight, gbc);
-        maxCost = new JLabel();
-        maxCost.setText("Цена");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.weightx = 1.0;
-        panelTables.add(maxCost, gbc);
-        labelDefaultData = new JLabel();
-        labelDefaultData.setText("Исходные данные");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        panelTables.add(labelDefaultData, gbc);
-        labelResultData = new JLabel();
-        labelResultData.setText("Итоговые данные");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(5, 0, 0, 0);
-        panelTables.add(labelResultData, gbc);
-        final JToolBar toolBar1 = new JToolBar();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 4;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        mainPanelGUI.add(toolBar1, gbc);
-        toolBar1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-        clearTable = new JButton();
-        clearTable.setText("Очистить таблицу");
-        toolBar1.add(clearTable);
-        importItems = new JButton();
-        importItems.setText("Импорт");
-        toolBar1.add(importItems);
-        aboutPrograms = new JButton();
-        aboutPrograms.setText("О программе");
-        toolBar1.add(aboutPrograms);
     }
 
     /**
@@ -325,7 +123,7 @@ public class GUI extends JFrame {
         panelEnters.setLayout(new GridBagLayout());
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
-        gbc.gridx = 3;
+        gbc.gridx = 4;
         gbc.gridy = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
@@ -426,16 +224,6 @@ public class GUI extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         panelEnters.add(panelBag, gbc);
         panelBag.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-        resultButton = new JButton();
-        resultButton.setText("Результат");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panelBag.add(resultButton, gbc);
         weightBag = new JTextField();
         weightBag.setText("");
         gbc = new GridBagConstraints();
@@ -455,74 +243,11 @@ public class GUI extends JFrame {
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         panelBag.add(labelWeightBag, gbc);
-        panelTables = new JPanel();
-        panelTables.setLayout(new GridBagLayout());
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 3;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(10, 10, 10, 0);
-        mainPanelGUI.add(panelTables, gbc);
-        panelTables.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, this.$$$getFont$$$(null, -1, -1, panelTables.getFont()), null));
-        final JScrollPane scrollPane1 = new JScrollPane();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        panelTables.add(scrollPane1, gbc);
-        scrollPane1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-        scrollPane1.setViewportView(tableItemsAfter);
-        final JScrollPane scrollPane2 = new JScrollPane();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        panelTables.add(scrollPane2, gbc);
-        scrollPane2.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-        scrollPane2.setViewportView(tableItemsBefore);
-        maxWeight = new JLabel();
-        maxWeight.setText("Вес");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.weightx = 1.0;
-        panelTables.add(maxWeight, gbc);
-        maxCost = new JLabel();
-        maxCost.setText("Цена");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.weightx = 1.0;
-        panelTables.add(maxCost, gbc);
-        labelDefaultData = new JLabel();
-        labelDefaultData.setText("Исходные данные");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        panelTables.add(labelDefaultData, gbc);
-        labelResultData = new JLabel();
-        labelResultData.setText("Итоговые данные");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(5, 0, 0, 0);
-        panelTables.add(labelResultData, gbc);
         final JToolBar toolBar1 = new JToolBar();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 4;
+        gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         mainPanelGUI.add(toolBar1, gbc);
         toolBar1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
@@ -535,28 +260,51 @@ public class GUI extends JFrame {
         aboutPrograms = new JButton();
         aboutPrograms.setText("О программе");
         toolBar1.add(aboutPrograms);
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
-        if (currentFont == null) return null;
-        String resultName;
-        if (fontName == null) {
-            resultName = currentFont.getName();
-        } else {
-            Font testFont = new Font(fontName, Font.PLAIN, 10);
-            if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
-                resultName = fontName;
-            } else {
-                resultName = currentFont.getName();
-            }
-        }
-        Font font = new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
-        boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
-        Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
-        return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
+        panelData = new JPanel();
+        panelData.setLayout(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 4;
+        gbc.weightx = 0.7;
+        gbc.fill = GridBagConstraints.BOTH;
+        mainPanelGUI.add(panelData, gbc);
+        panelAfterItems = new JPanel();
+        panelAfterItems.setLayout(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        panelData.add(panelAfterItems, gbc);
+        final JScrollPane scrollPane1 = new JScrollPane();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        panelAfterItems.add(scrollPane1, gbc);
+        scrollPane1.setViewportView(tableBeforeTable);
+        panelBeforeItems = new JPanel();
+        panelBeforeItems.setLayout(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        panelData.add(panelBeforeItems, gbc);
+        resultButton = new JButton();
+        resultButton.setText("Получить результат");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panelBeforeItems.add(resultButton, gbc);
     }
 
     /**
@@ -565,4 +313,5 @@ public class GUI extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return mainPanelGUI;
     }
+
 }
