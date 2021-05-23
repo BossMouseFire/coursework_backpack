@@ -1,115 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="GUI">
-  <grid id="27dc6" binding="mainPanelGUI" layout-manager="GridBagLayout">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1">
+  <grid id="27dc6" binding="container" layout-manager="GridBagLayout">
     <constraints>
-      <xy x="20" y="24" width="801" height="625"/>
+      <xy x="20" y="20" width="812" height="428"/>
     </constraints>
     <properties/>
-    <border type="none">
-      <title-color color="-4473925"/>
-    </border>
+    <border type="none"/>
     <children>
-      <grid id="8f41d" binding="panelEnters" layout-manager="GridBagLayout">
+      <grid id="14fdd" binding="inputDataContainer" layout-manager="GridBagLayout">
         <constraints>
-          <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-          <gridbag top="10" left="5" bottom="10" right="10" weightx="1.0" weighty="1.0"/>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag top="10" left="10" bottom="10" right="10" weightx="1.0" weighty="1.0"/>
         </constraints>
         <properties/>
         <border type="none"/>
         <children>
-          <grid id="e84a9" binding="panelItem" layout-manager="GridBagLayout">
+          <grid id="77ff2" binding="weightPanel" layout-manager="GridBagLayout">
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-              <gridbag top="5" left="0" bottom="0" right="0" weightx="1.0" weighty="1.0"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag top="10" left="0" bottom="0" right="0" weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties/>
-            <border type="etched"/>
+            <border type="none"/>
             <children>
-              <component id="3f9e4" class="javax.swing.JButton" binding="addItemButton">
+              <component id="ae303" class="javax.swing.JButton" binding="resultButton">
                 <constraints>
-                  <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="1.0" weighty="1.0"/>
+                  <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="1.0" weighty="0.2"/>
                 </constraints>
                 <properties>
-                  <text value="Добавить предмет"/>
+                  <font name="JetBrains Mono" style="0"/>
+                  <text value="Результат"/>
                 </properties>
               </component>
-              <component id="feca1" class="javax.swing.JTextField" binding="weightInput">
+              <component id="322de" class="javax.swing.JLabel" binding="maxWeightLabel">
                 <constraints>
-                  <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.1" weighty="0.6"/>
+                </constraints>
+                <properties>
+                  <font name="JetBrains Mono" size="14" style="0"/>
+                  <text value="Максимальный вес объекта"/>
+                </properties>
+              </component>
+              <component id="2fa22" class="javax.swing.JTextField" binding="inputMaxWeight">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
-                  <gridbag weightx="1.0" weighty="1.0"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="27d67" class="javax.swing.JLabel" binding="labelWeight">
-                <constraints>
-                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="1.0" weighty="1.0"/>
+                  <gridbag weightx="1.0" weighty="0.6"/>
                 </constraints>
                 <properties>
-                  <text value="Вес"/>
+                  <text value="вес"/>
                 </properties>
               </component>
-              <component id="bdc4c" class="javax.swing.JTextField" binding="costInput">
-                <constraints>
-                  <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="-1"/>
-                  </grid>
-                  <gridbag weightx="1.0" weighty="1.0"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="39f7d" class="javax.swing.JLabel" binding="labelCost">
-                <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="1.0" weighty="1.0"/>
-                </constraints>
-                <properties>
-                  <text value="Цена"/>
-                </properties>
-              </component>
-              <component id="34ab1" class="javax.swing.JTextField" binding="nameInput">
-                <constraints>
-                  <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="-1"/>
-                  </grid>
-                  <gridbag weightx="1.0" weighty="1.0"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="5e0ce" class="javax.swing.JLabel" binding="labelName">
-                <constraints>
-                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="1.0" weighty="1.0"/>
-                </constraints>
-                <properties>
-                  <text value="Название"/>
-                </properties>
-              </component>
-              <component id="ab3d7" class="javax.swing.JLabel" binding="labelItem">
+            </children>
+          </grid>
+          <grid id="ff7bf" binding="formObject" layout-manager="GridBagLayout">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="7ca63" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                   <gridbag weightx="1.0" weighty="1.0"/>
                 </constraints>
                 <properties>
-                  <text value="Предмет"/>
+                  <font name="JetBrains Mono" size="16" style="0"/>
+                  <text value="Форма предмета"/>
+                  <verticalAlignment value="0"/>
                 </properties>
               </component>
-            </children>
-          </grid>
-          <grid id="d2ad8" binding="panelBag" layout-manager="GridBagLayout">
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="1.0" weighty="1.0"/>
-            </constraints>
-            <properties/>
-            <border type="etched"/>
-            <children>
-              <component id="69ca9" class="javax.swing.JTextField" binding="weightBag">
+              <component id="20f82" class="javax.swing.JButton" binding="addObjectToTable">
                 <constraints>
-                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="1.0" weighty="1.0"/>
+                </constraints>
+                <properties>
+                  <font name="JetBrains Mono" style="0"/>
+                  <text value="Добавить предмет"/>
+                </properties>
+              </component>
+              <component id="e5094" class="javax.swing.JLabel" binding="nameObjectLabel">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.2" weighty="1.0"/>
+                </constraints>
+                <properties>
+                  <font name="JetBrains Mono" size="14" style="0"/>
+                  <text value="Название предмета"/>
+                </properties>
+              </component>
+              <component id="fd471" class="javax.swing.JTextField" binding="inputNameObject">
+                <constraints>
+                  <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <gridbag weightx="1.0" weighty="1.0"/>
@@ -118,100 +106,80 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="464dd" class="javax.swing.JLabel" binding="labelWeightBag">
+              <component id="e72c2" class="javax.swing.JTextField" binding="inputWeightObject">
                 <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
                   <gridbag weightx="1.0" weighty="1.0"/>
                 </constraints>
+                <properties/>
+              </component>
+              <component id="243a6" class="javax.swing.JTextField" binding="inputCostObject">
+                <constraints>
+                  <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <gridbag weightx="1.0" weighty="1.0"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="3a15c" class="javax.swing.JLabel" binding="weightObjectLabel">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.2" weighty="1.0"/>
+                </constraints>
                 <properties>
-                  <text value="Максимальный вес рюкзака"/>
+                  <font name="JetBrains Mono" size="14" style="0"/>
+                  <text value="Вес предмета"/>
+                </properties>
+              </component>
+              <component id="5157a" class="javax.swing.JLabel" binding="costObjectLabel">
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.2" weighty="1.0"/>
+                </constraints>
+                <properties>
+                  <font name="JetBrains Mono" size="14" style="0"/>
+                  <text value="Цена предмета"/>
                 </properties>
               </component>
             </children>
           </grid>
         </children>
       </grid>
-      <toolbar id="fdd01">
+      <grid id="64095" binding="outputDataContainer" layout-manager="GridBagLayout">
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="-1" height="20"/>
-          </grid>
-          <gridbag weightx="0.0" weighty="0.0"/>
-        </constraints>
-        <properties/>
-        <border type="etched"/>
-        <children>
-          <component id="a8a4f" class="javax.swing.JButton" binding="clearTable">
-            <constraints/>
-            <properties>
-              <text value="Очистить таблицу"/>
-            </properties>
-          </component>
-          <component id="4bf40" class="javax.swing.JButton" binding="importItems">
-            <constraints/>
-            <properties>
-              <text value="Импорт"/>
-            </properties>
-          </component>
-          <component id="4373c" class="javax.swing.JButton" binding="aboutPrograms">
-            <constraints/>
-            <properties>
-              <text value="О программе"/>
-            </properties>
-          </component>
-        </children>
-      </toolbar>
-      <grid id="5d20f" binding="panelData" layout-manager="GridBagLayout">
-        <constraints>
-          <grid row="1" column="0" row-span="1" col-span="4" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-          <gridbag weightx="0.7" weighty="0.0"/>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag top="10" left="10" bottom="10" right="10" weightx="1.0" weighty="1.0"/>
         </constraints>
         <properties/>
         <border type="none"/>
         <children>
-          <grid id="21afd" binding="panelAfterItems" layout-manager="GridBagLayout">
+          <scrollpane id="26d54">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="1.0" weighty="1.0"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag top="10" left="0" bottom="10" right="0" weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties/>
             <border type="none"/>
             <children>
-              <scrollpane id="15944">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="1.0" weighty="1.0"/>
-                </constraints>
+              <component id="80b2d" class="javax.swing.JTable" binding="tableInputData" custom-create="true">
+                <constraints/>
                 <properties/>
-                <border type="none"/>
-                <children>
-                  <component id="5d150" class="javax.swing.JTable" binding="tableBeforeTable" custom-create="true">
-                    <constraints/>
-                    <properties/>
-                  </component>
-                </children>
-              </scrollpane>
-            </children>
-          </grid>
-          <grid id="89ef0" binding="panelBeforeItems" layout-manager="GridBagLayout">
-            <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="1.0" weighty="1.0"/>
-            </constraints>
-            <properties/>
-            <border type="none"/>
-            <children>
-              <component id="d1dbb" class="javax.swing.JButton" binding="resultButton">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="1.0" weighty="1.0"/>
-                </constraints>
-                <properties>
-                  <text value="Получить результат"/>
-                </properties>
               </component>
             </children>
-          </grid>
+          </scrollpane>
+          <component id="448f6" class="javax.swing.JLabel" binding="tableInputLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag top="20" left="0" bottom="0" right="0" weightx="1.0" weighty="0.05"/>
+            </constraints>
+            <properties>
+              <font name="JetBrains Mono" size="16" style="0"/>
+              <text value="Таблица исходных данных"/>
+            </properties>
+          </component>
         </children>
       </grid>
     </children>

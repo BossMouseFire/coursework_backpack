@@ -1,54 +1,41 @@
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Scanner;
+import java.util.*;
 
 class ContinuousBackpack {
     private int weightBag;
-    private final Item[] items;
-    public ContinuousBackpack(int weightBag, Item[] items) {
+    private final ArrayList<Item> items;
+
+    public ContinuousBackpack(int weightBag, ArrayList<Item> items) {
         this.weightBag = weightBag;
         this.items = items;
     }
 
-    public Item[] run(){
-        Arrays.sort(items, new Comparator<Item>() {
-            @Override
-            public int compare(Item o1, Item o2) {
-                double r1 = (double) o1.getWeight() / o1.getCost();
-                double r2 = (double) o2.getWeight() / o2.getCost();
-                if(r1 > r2){
-                    return 1;
-                }
-                else if(r1 < r2){
-                    return -1;
-                }
-                return 0;
-            }
-        });
+    public ArrayList<Item> run(){
+
         double result = 0;
-        Item[] itemsBefore = new Item[items.length];
+        ArrayList<Item> itemsBefore = new ArrayList<>();
         int resultWeight = 0;
-        for(int i = 0; i < items.length; i++){
-            if(items[i].getWeight() <= weightBag){
-                result += items[i].getCost();
-                weightBag -= items[i].getWeight();
-                itemsBefore[i] = new Item(items[i].getName(), items[i].getCost(), items[i].getWeight());
-                resultWeight += items[i].getWeight();
+        Collections.sort(items);
+
+        for (Item item : items) {
+            if (item.getWeight() <= weightBag) {
+                result += item.getCost();
+                weightBag -= item.getWeight();
+                itemsBefore.add(new Item(item.getName(), item.getCost(), item.getWeight()));
+                resultWeight += item.getWeight();
             }
         }
-        System.out.print("Максимальня стоимость - " + result + " Максимальный вес - " + resultWeight);
         return itemsBefore;
     }
 }
 
-class Item{
+class Item implements Comparable<Item>{
     private final int cost;
     private final int weight;
     private final String name;
     public Item(String name, int cost, int weight) {
+        this.name = name;
         this.cost = cost;
         this.weight = weight;
-        this.name = name;
     }
 
     @Override
@@ -70,4 +57,19 @@ class Item{
     public String getName() {
         return name;
     }
+
+
+    @Override
+    public int compareTo(Item o) {
+        double r1 = (double) o.getWeight() / o.getCost();
+        double r2 = (double) getWeight() / getCost();
+        if(r1 < r2){
+            return 1;
+        }
+        else if(r1 > r2){
+            return -1;
+        }
+        return 0;
+    }
 }
+

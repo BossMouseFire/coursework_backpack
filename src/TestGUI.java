@@ -69,17 +69,17 @@ public class TestGUI extends JFrame {
 
 }
 
-class TableInfoRenderer extends DefaultTableCellRenderer {
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value,
-                                                   boolean isSelected, boolean hasFocus, int row, int column) {
-        JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
-
-        if(column==0) c.setHorizontalAlignment(CENTER);
-        else  c.setHorizontalAlignment(LEFT);
-
-        if(row == 2) c.setBackground(Color.red);
-        else c.setBackground(new JLabel().getBackground());
-        return c;
-    }
-}
+//class TableInfoRenderer extends DefaultTableCellRenderer {
+//    @Override
+//    public Component getTableCellRendererComponent(JTable table, Object value,
+//                                                   boolean isSelected, boolean hasFocus, int row, int column) {
+//        JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
+//
+//        if(column==0) c.setHorizontalAlignment(CENTER);
+//        else  c.setHorizontalAlignment(LEFT);
+//
+//        if(row == 2) c.setBackground(Color.red);
+//        else c.setBackground(new JLabel().getBackground());
+//        return c;
+//    }
+//}
