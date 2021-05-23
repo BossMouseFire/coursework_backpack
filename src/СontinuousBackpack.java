@@ -10,18 +10,12 @@ class ContinuousBackpack {
     }
 
     public ArrayList<Item> run(){
-
-        double result = 0;
         ArrayList<Item> itemsBefore = new ArrayList<>();
-        int resultWeight = 0;
         Collections.sort(items);
-
         for (Item item : items) {
             if (item.getWeight() <= weightBag) {
-                result += item.getCost();
                 weightBag -= item.getWeight();
                 itemsBefore.add(new Item(item.getName(), item.getCost(), item.getWeight()));
-                resultWeight += item.getWeight();
             }
         }
         return itemsBefore;

@@ -18,21 +18,11 @@
           <grid id="77ff2" binding="weightPanel" layout-manager="GridBagLayout">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-              <gridbag top="10" left="0" bottom="0" right="0" weightx="1.0" weighty="1.0"/>
+              <gridbag top="10" left="0" bottom="0" right="0" weightx="1.0" weighty="0.3"/>
             </constraints>
             <properties/>
             <border type="none"/>
             <children>
-              <component id="ae303" class="javax.swing.JButton" binding="resultButton">
-                <constraints>
-                  <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="1.0" weighty="0.2"/>
-                </constraints>
-                <properties>
-                  <font name="JetBrains Mono" style="0"/>
-                  <text value="Результат"/>
-                </properties>
-              </component>
               <component id="322de" class="javax.swing.JLabel" binding="maxWeightLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -59,7 +49,7 @@
           <grid id="ff7bf" binding="formObject" layout-manager="GridBagLayout">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="1.0" weighty="1.0"/>
+              <gridbag weightx="1.0" weighty="0.7"/>
             </constraints>
             <properties/>
             <border type="none"/>
@@ -142,6 +132,16 @@
                 <properties>
                   <font name="JetBrains Mono" size="14" style="0"/>
                   <text value="Цена предмета"/>
+                </properties>
+              </component>
+              <component id="ae303" class="javax.swing.JButton" binding="resultButton">
+                <constraints>
+                  <grid row="5" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="1.0" weighty="0.2"/>
+                </constraints>
+                <properties>
+                  <font name="JetBrains Mono" style="0"/>
+                  <text value="Результат"/>
                 </properties>
               </component>
             </children>
