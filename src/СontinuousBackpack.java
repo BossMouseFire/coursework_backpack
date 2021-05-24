@@ -11,7 +11,7 @@ class ContinuousBackpack {
 
     public ArrayList<Item> run(){
         ArrayList<Item> itemsBefore = new ArrayList<>();
-        Collections.sort(items);
+        sortItems();
         for (Item item : items) {
             if (item.getWeight() <= weightBag) {
                 weightBag -= item.getWeight();
@@ -20,16 +20,21 @@ class ContinuousBackpack {
         }
         return itemsBefore;
     }
+    public void sortItems(){
+        Collections.sort(items);
+    }
 }
 
 class Item implements Comparable<Item>{
     private final int cost;
     private final int weight;
     private final String name;
+    private final double ratioWeightToPrice;
     public Item(String name, int cost, int weight) {
         this.name = name;
         this.cost = cost;
         this.weight = weight;
+        this.ratioWeightToPrice = (double) weight / cost;
     }
 
     @Override
@@ -37,6 +42,8 @@ class Item implements Comparable<Item>{
         return "Item{" +
                 "cost=" + cost +
                 ", weight=" + weight +
+                ", name='" + name + '\'' +
+                ", ratioWeightToPrice=" + ratioWeightToPrice +
                 '}';
     }
 
@@ -52,11 +59,14 @@ class Item implements Comparable<Item>{
         return name;
     }
 
+    public double getRatioWeightToPrice() {
+        return ratioWeightToPrice;
+    }
 
     @Override
     public int compareTo(Item o) {
-        double r1 = (double) o.getWeight() / o.getCost();
-        double r2 = (double) getWeight() / getCost();
+        double r1 = o.getRatioWeightToPrice();
+        double r2 = getRatioWeightToPrice();
         if(r1 < r2){
             return 1;
         }

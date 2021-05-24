@@ -24,10 +24,16 @@ public class GUI extends JFrame {
     private final JButton nextLevel;
     private final JButton finishAlgorithm;
     private JTable tableProcess;
+    private JTable tableSorted;
     private int columnTable;
     private JLabel textInstruction;
     private final JButton restart;
     private final JButton aboutProject;
+    private int typeAction;
+    private int costProcess;
+    private int weightProcess;
+    private int weightBagProcess;
+    private ArrayList<Item> itemsProcess;
     public static void main(String[] args) {
         GUI gui = new GUI();
         gui.setSize(750, 400);
@@ -35,13 +41,16 @@ public class GUI extends JFrame {
     }
 
     public GUI() {
-        super("Задача о рюкзаке (динамическое программирование)");
+        super("Задача о рюкзаке (жадный алгоритм)");
         $$$setupUI$$$();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(container);
         this.pack();
         this.getContentPane().setBackground(Color.decode("#edfeff"));
-        columnTable = 2;
+        typeAction = 0;
+        costProcess = 0;
+        weightProcess = 0;
+        itemsProcess = new ArrayList<>();
         nextLevel = new JButton("Следующий шаг");
         finishAlgorithm = new JButton("Завершить");
         restart = new JButton("Начать заново");
@@ -51,28 +60,25 @@ public class GUI extends JFrame {
         addObjectToTable.addActionListener(e -> {
             DefaultTableModel model = (DefaultTableModel) tableInputData.getModel();
 
-            if(!inputCostObject.getText().matches("[-+]?\\d+")){
+            if (!inputCostObject.getText().matches("[-+]?\\d+")) {
                 JOptionPane.showMessageDialog(
                         null,
                         "Поле «Цена предмета» должно иметь целое числовое значение",
                         "Ошибка",
                         JOptionPane.WARNING_MESSAGE);
-            }
-            else if(!inputWeightObject.getText().matches("[-+]?\\d+")){
+            } else if (!inputWeightObject.getText().matches("[-+]?\\d+")) {
                 JOptionPane.showMessageDialog(
                         null,
                         "Поле «Вес предмета» должно иметь целое числовое значение",
                         "Ошибка",
                         JOptionPane.WARNING_MESSAGE);
-            }
-            else if(inputNameObject.getText().equals("")){
+            } else if (inputNameObject.getText().equals("")) {
                 JOptionPane.showMessageDialog(
                         null,
                         "Поле «Название предмета» не должно иметь пустое значение",
                         "Ошибка",
                         JOptionPane.WARNING_MESSAGE);
-            }
-            else{
+            } else {
                 model.addRow(new Object[]{
                         inputNameObject.getText(),
                         inputCostObject.getText(),
@@ -93,28 +99,27 @@ public class GUI extends JFrame {
             container.revalidate();
         });
         resultButton.addActionListener(e -> {
-            if (!inputMaxWeight.getText().matches("[-+]?\\d+")){
+            if (!inputMaxWeight.getText().matches("[-+]?\\d+")) {
                 JOptionPane.showMessageDialog(
                         null,
                         "Поле «Максимальный вес рюкзака» должно иметь целое числовое значение",
                         "Ошибка",
                         JOptionPane.WARNING_MESSAGE);
-            }
-            else if(Integer.parseInt(inputMaxWeight.getText()) == 0){
+            } else if (Integer.parseInt(inputMaxWeight.getText()) == 0) {
                 JOptionPane.showMessageDialog(
                         null,
                         "Поле «Максимальный вес рюкзака» не должно быть равно нулю",
                         "Ошибка",
                         JOptionPane.WARNING_MESSAGE);
-            }
-            else if(items.size() == 0){
+            } else if (items.size() == 0) {
                 JOptionPane.showMessageDialog(
                         null,
                         "Количество предметов в рюкзаке не должно быть равно нулю",
                         "Ошибка",
                         JOptionPane.WARNING_MESSAGE);
-            }
-            else{
+            } else {
+                weightBagProcess = Integer.parseInt(inputMaxWeight.getText());
+                itemsProcess = new ArrayList<>(items);
                 algorithmBlock();
                 createTableInput();
             }
@@ -243,7 +248,7 @@ public class GUI extends JFrame {
             Font restartFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, -1, restart.getFont());
             if (restartFont != null) restart.setFont(restartFont);
 
-            Font aboutProjectFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN,  -1, aboutProject.getFont());
+            Font aboutProjectFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, -1, aboutProject.getFont());
             if (aboutProjectFont != null) aboutProject.setFont(aboutProjectFont);
 
             buttonsBlock.add(restart);
@@ -259,70 +264,46 @@ public class GUI extends JFrame {
             container.repaint();
             container.revalidate();
         });
+
+        ArrayList<Item> itemsAdded = new ArrayList<>();
         nextLevel.addActionListener(e -> {
             int weightBag = Integer.parseInt(inputMaxWeight.getText());
-            int maxCostBag = 0;
-            DefaultTableCellRenderer tableCellRenderer = new DefaultTableCellRenderer();
-
-            if (columnTable == (items.size() + 1)) {
-                tableCellRenderer.setBackground(Color.green);
+            if (typeAction == 0) {
+                new ContinuousBackpack(weightBag, itemsProcess).sortItems();
+                DefaultTableModel model = (DefaultTableModel) tableSorted.getModel();
+                while (tableSorted.getRowCount() != 0) {
+                    model.removeRow(0);
+                }
+                for (Item item : itemsProcess) {
+                    model.addRow(new Object[]{
+                            item.getName(),
+                            item.getCost(),
+                            item.getWeight(),
+                            item.getRatioWeightToPrice()}
+                    );
+                }
+                typeAction += 1;
             } else {
-                tableCellRenderer.setBackground(Color.decode("#d1cfcf"));
-            }
+                if (itemsProcess.get(0).getWeight() <= weightBagProcess) {
+                    DefaultTableModel model = (DefaultTableModel) tableProcess.getModel();
+                    StringBuilder addedItems = new StringBuilder();
+                    costProcess += itemsProcess.get(0).getCost();
+                    weightProcess += itemsProcess.get(0).getWeight();
 
-            tableProcess.setDefaultRenderer(
-                    Object.class,
-                    new TableInfoRenderer(
-                            Integer.parseInt(inputMaxWeight.getText())
-                    )
-            );
+                    itemsAdded.add(itemsProcess.get(0));
 
-            for (int row = 1; row <= weightBag; row++) {
-                int maxNumber;
-                try {
-                    maxNumber = Math.max(
-                            getCellTable(
-                                    row - items.get(columnTable - 2).getWeight(),
-                                    columnTable - 1) +
-                                    items.get(columnTable - 2).getCost(),
-                            getCellTable(row, columnTable - 1));
-                } catch (Exception ex) {
-                    maxNumber = getCellTable(row, columnTable - 1);
+                    for (Item item : itemsAdded) {
+                        addedItems.append(item.getName()).append(";");
+                    }
+
+                    weightBagProcess -= itemsProcess.get(0).getWeight();
+                    itemsProcess.remove(0);
+                    ;
+                    model.addRow(new Object[]{costProcess, addedItems.toString(), weightProcess + "/" + weightBag});
+                    typeAction += 1;
                 }
-                if (columnTable == (items.size() + 1) && row == weightBag) {
-                    maxCostBag = maxNumber;
-                }
-                tableProcess.getModel().setValueAt(maxNumber, row, columnTable);
             }
-
-            String text;
-
-            if (columnTable == (items.size() + 1)) {
-                text = "<html><body style='width: 200px'>" +
-                        "<p>Максимальная стоимость рюкзака - " +
-                        "<b>" + maxCostBag + "</b>" + " ед." +
-                        "<br/>Нажмите кнопку <b>Завершить</b>, чтобы получить полноценный результат программы.</p>" +
-                        "</body></html>";
-                textInstruction.setText(text);
-            }
-
-            else if (columnTable == 2) {
-                text = "<html><body style='width: 200px'>" +
-                        "<p>Находим максимальную сумму среди двух чисел и записываем результут в ячейку. " +
-                        "Так идём до последней ячейки.</p>" +
-                        "</body></html>";
-                textInstruction.setText(text);
-            } else if (columnTable == 3) {
-                text = "<html><body style='width: 200px'>" +
-                        "<p>Продолжаем наблюдать за алгоритмом до его окончания</p>" +
-                        "</body></html>";
-                textInstruction.setText(text);
-            }
-
-
-            tableProcess.getColumnModel().getColumn(columnTable++).setCellRenderer(tableCellRenderer);
-
-            if (columnTable == (items.size() + 2)) {
+            if (itemsProcess.get(0).getWeight() > weightBagProcess) {
                 buttonsProcessBlock.removeAll();
                 GridBagConstraints gbc = new GridBagConstraints();
                 gbc.gridx = 0;
@@ -331,21 +312,38 @@ public class GUI extends JFrame {
                 buttonsProcessBlock.add(finishAlgorithm, gbc);
                 tableProcess.setDefaultRenderer(
                         Object.class,
-                        new TableInfoRenderer(
-                                Integer.parseInt(inputMaxWeight.getText())
-                        )
+                        new TableInfoRenderer()
                 );
             }
-            container.repaint();
-            container.revalidate();
-        });
-    }
 
-    private int getCellTable(int row, int column) {
-        if (tableProcess.getModel().getValueAt(row, column) == null) {
-            return 0;
-        }
-        return (int) tableProcess.getModel().getValueAt(row, column);
+            String text;
+            if (itemsProcess.get(0).getWeight() > weightBagProcess) {
+                text = "<html><body style='width: 300px'>" +
+                        "<p>Максимальная стоимость рюкзака - " +
+                        "<b>" + costProcess + "</b>" + " ед." +
+                        "<br/>Нажмите кнопку <b>Завершить</b>, чтобы получить полноценный результат программы.</p>" +
+                        "</body></html>";
+                textInstruction.setText(text);
+            } else if (typeAction == 1) {
+                text = "<html><body style='width: 300px'>" +
+                        "<p>Отлично, данные готовы к обработке!" +
+                        "Во второй таблице имеется три столбца: " +
+                        "<br/><b>Цена<b/> - показывает текущую стоимость рюкзака" +
+                        "<br/><b>Предметы<b/> - текущие предметы в рюкзаке" +
+                        "<br/><b>Вес<b/> - текущая заполненность рюкзака" +
+                        "<br/>Нажмите «Следущий шаг» для продолжения алгоритма</p>" +
+                        "</body></html>";
+                textInstruction.setText(text);
+            } else {
+                text = "<html><body style='width: 300px'>" +
+                        "<p>Предметы постепенно добавляются в рюкзак. " +
+                        "<br/>Процесс будет идти, пока вес предмета не превысит свободное место." +
+                        "<br/>Нажмите «Следущий шаг» для продолжения алгоритма " +
+                        "или нажмите «Завершить», чтобы получить итог.</p>" +
+                        "</body></html>";
+                textInstruction.setText(text);
+            }
+        });
     }
 
     private void createTableInput() {
@@ -377,20 +375,21 @@ public class GUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 1.0;
-        gbc.weighty = 0.4;
+        gbc.weighty = 0.6;
         gbc.fill = GridBagConstraints.BOTH;
         inputDataContainer.add(scrollPane, gbc);
 
-        String text = "<html><body style='width: 200px'><p>Алгоритм заполнения рюкзака представлен ввиде таблицы." +
-                "<br/>По горизонтали размещён вес предметов." +
-                "<br/>По вертикали - вес рюкзака." +
-                "<br/>Максиальный вес сумки - <b>" + inputMaxWeight.getText() + "</b> ед." + "</p></body></html>";
+        String text = "<html><body style='width: 300px'><p>Алгоритм заполнения рюкзака представлен в виде таблиц." +
+                "<br/><b>Первая таблица<b/> - это список предметов, сортированных по коэффициенту." +
+                "<br/><b>Вторая таблица<b/> - это список, добавленных предметов в рюкзак." +
+                "<br>Нажмите кнопку <b>«Следующий шаг»<b/>, чтобы отсортировать данный и начать алгоритм." +
+                "<br/>Максиальный вес сумки - <b>" + inputMaxWeight.getText() + "</b> кг." + "</p></body></html>";
         textInstruction = new JLabel(text);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 1.0;
-        gbc.weighty = 0.6;
+        gbc.weighty = 0.4;
         gbc.fill = GridBagConstraints.CENTER;
 
         Font textLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 15, tableInputLabel.getFont());
@@ -403,39 +402,69 @@ public class GUI extends JFrame {
     }
 
     private void algorithmBlock() {
-        DefaultTableModel model = new DefaultTableModel();
-        tableProcess = new JTable(model);
+        DefaultTableModel modelSort = new DefaultTableModel();
+        DefaultTableModel modelProcess = new DefaultTableModel();
+        tableProcess = new JTable(modelProcess);
+        tableSorted = new JTable(modelSort);
         outputDataContainer.removeAll();
         outputDataContainer.setLayout(new GridBagLayout());
         GridBagConstraints gbc;
 
-        model.addColumn("Вес / Вес товара");
-        model.addColumn("");
-        int weightBag = Integer.parseInt(inputMaxWeight.getText());
+        modelSort.addColumn("Название");
+        modelSort.addColumn("Цена");
+        modelSort.addColumn("Вес");
+        modelSort.addColumn("Коэффицент");
 
-        for (Item item : items) {
-            model.addColumn(item.getWeight());
+        for(Item item: items){
+            modelSort.addRow(new Object[]{
+                    item.getName(),
+                    item.getCost(),
+                    item.getWeight(),
+                    item.getRatioWeightToPrice()}
+                    );
         }
-        for (int i = 0; i <= weightBag; i++) {
-            model.addRow(new Object[]{i});
-        }
-
-        for (int row = 0; row <= weightBag; row++) {
-            tableProcess.getModel().setValueAt(0, row, 1);
-        }
-        for (int column = 1; column <= items.size() + 1; column++) {
-            tableProcess.getModel().setValueAt(0, 0, column);
-        }
-        JScrollPane scrollPane = new JScrollPane(tableProcess);
+        JLabel tableRatioLabel = new JLabel("Таблица коэффициентов");
+        Font tableRatioFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 13, tableRatioLabel.getFont());
+        if (tableRatioFont != null) tableRatioLabel.setFont(tableRatioFont);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(0, 0, 5, 0);
+        outputDataContainer.add(tableRatioLabel, gbc);
+
+        JScrollPane scrollSorted = new JScrollPane(tableSorted);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
+        gbc.weighty = 0.4;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
-        outputDataContainer.add(scrollPane, gbc);
+        outputDataContainer.add(scrollSorted, gbc);
 
+        JLabel tableProcessLabel = new JLabel("Таблица содержимого рюкзака");
+        Font tableProcessFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 13, tableProcessLabel.getFont());
+        if (tableProcessFont != null) tableProcessLabel.setFont(tableProcessFont);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(5, 0, 5, 0);
+        outputDataContainer.add(tableProcessLabel, gbc);
+
+        modelProcess.addColumn("Цена");
+        modelProcess.addColumn("Предметы");
+        modelProcess.addColumn("Вес");
+        JScrollPane scrollProcess = new JScrollPane(tableProcess);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.6;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        outputDataContainer.add(scrollProcess, gbc);
 
         buttonsProcessBlock = new JPanel();
         buttonsProcessBlock.setBackground(Color.decode("#edfeff"));
@@ -450,24 +479,23 @@ public class GUI extends JFrame {
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 5;
         gbc.weightx = 1;
 
         outputDataContainer.add(buttonsProcessBlock, gbc);
 
+        JLabel processLabel = new JLabel();
+        Font processLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 16, processLabel.getFont());
+        if (processLabelFont != null) processLabel.setFont(processLabelFont);
 
-        JLabel tableProcessLabel = new JLabel();
-        Font tableProcessLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 16, tableProcessLabel.getFont());
-        if (tableProcessLabelFont != null) tableProcessLabel.setFont(tableProcessLabelFont);
-
-        tableProcessLabel.setText("Алгоритм заполнения рюкзака");
-        tableProcessLabel.setHorizontalAlignment(JLabel.CENTER);
+        processLabel.setText("Алгоритм заполнения рюкзака");
+        processLabel.setHorizontalAlignment(JLabel.CENTER);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.insets = new Insets(10, 0, 10, 0);
-        outputDataContainer.add(tableProcessLabel, gbc);
+        outputDataContainer.add(processLabel, gbc);
 
         container.repaint();
         container.revalidate();
@@ -709,10 +737,6 @@ public class GUI extends JFrame {
 }
 
 class TableInfoRenderer extends DefaultTableCellRenderer {
-    private final int size;
-    public TableInfoRenderer(int size){
-        this.size = size;
-    }
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus, int row, int column) {
