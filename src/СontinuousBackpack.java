@@ -20,6 +20,7 @@ class ContinuousBackpack {
         }
         return itemsBefore;
     }
+
     public void sortItems(){
         Collections.sort(items);
     }

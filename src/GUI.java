@@ -1,8 +1,6 @@
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.util.*;
 
@@ -18,29 +16,34 @@ public class GUI extends JFrame {
     private JTextField inputMaxWeight;
     private JTable tableInputData;
     private JLabel tableInputLabel;
-    private final ArrayList<Item> items;
+    private ArrayList<Item> items;
     private JPanel buttonsProcessBlock;
     private final JButton nextLevel;
     private final JButton finishAlgorithm;
     private JTable tableProcess;
     private JTable tableSorted;
     private JLabel textInstruction;
-    private final JButton aboutProject;
     private int typeAction;
     private int costProcess;
     private int weightProcess;
     private int weightBagProcess;
     private ArrayList<Item> itemsProcess;
     private JButton startOfProgram;
+    private final JButton deleteItem;
+    private JPanel actionItem;
+    private JTextField inputDeleteIndex;
+    private final JButton backToAddPanel;
+    private int deleteIndexItem;
+    private int stateStrTableProcess;
     public static void main(String[] args) {
         GUI gui = new GUI();
-        gui.setSize(750, 400);
+        gui.setSize(790, 400);
         gui.setVisible(true);
     }
 
     public GUI() {
         super("Задача о рюкзаке (жадный алгоритм)");
-        $$$setupUI$$$();
+        startGUI();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(container);
         this.pack();
@@ -48,13 +51,17 @@ public class GUI extends JFrame {
         typeAction = 0;
         costProcess = 0;
         weightProcess = 0;
+        deleteIndexItem = 0;
+        stateStrTableProcess = -1;
         itemsProcess = new ArrayList<>();
         nextLevel = new JButton("Следующий шаг");
         finishAlgorithm = new JButton("Завершить");
-        aboutProject = new JButton("О проекте");
+        addObjectToTable = new JButton("Добавить");
+        deleteItem = new JButton("Удалить");
         items = new ArrayList<>();
-        addObjectToTable = new JButton("Добавить предмет");
         resultButton = new JButton("Получить результат");
+        backToAddPanel = new JButton("Назад");
+        backToAddPanel.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
         addObjectToTable.addActionListener(e -> {
             DefaultTableModel model = (DefaultTableModel) tableInputData.getModel();
 
@@ -87,10 +94,83 @@ public class GUI extends JFrame {
                                 Integer.parseInt(inputWeightObject.getText()))
                 );
             }
-
         });
+        deleteItem.addActionListener(e -> {
+            DefaultTableModel model = (DefaultTableModel) tableInputData.getModel();
+            if(deleteIndexItem == 0){
+                actionItem.removeAll();
+                inputDeleteIndex = new JTextField("Введите индекс предмета");
+                actionItem.add(inputDeleteIndex);
+                actionItem.add(deleteItem);
+                actionItem.add(backToAddPanel);
+                container.repaint();
+                container.revalidate();
+                deleteIndexItem = 1;
+            }
+            else{
+                 if(items.size() == 0){
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Количество предметов в рюкзаке не должно быть равно нулю",
+                            "Ошибка",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+                else if(inputDeleteIndex.getText().equals("")){
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Поле с индексом предмета не должно быть пустым",
+                            "Ошибка",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+                else if(!inputDeleteIndex.getText().matches("[-+]?\\d+")){
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Поле с индексом предмета должно содержать целочисленное значение",
+                            "Ошибка",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+                else if(Integer.parseInt(inputDeleteIndex.getText()) < 0 ||
+                        Integer.parseInt(inputDeleteIndex.getText()) >= items.size()){
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Значение индекса должно находится в диапазоне количества предметов",
+                            "Ошибка",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+                else{
+                    int indexDeletedItem = Integer.parseInt(inputDeleteIndex.getText());
+                    int input = JOptionPane.showConfirmDialog(null, "Вы действительно хотите удалить предмет?", "Выберите действие...",
+                            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+                    if (input == 0) {
+                        items.remove(indexDeletedItem);
+                        model.removeRow(indexDeletedItem);
+                        actionItem.removeAll();
+                        actionItem.add(addObjectToTable);
+                        actionItem.add(deleteItem);
+                        deleteIndexItem = 0;
+                        container.repaint();
+                        container.revalidate();
+                    }
+                }
+            }
+        });
+        backToAddPanel.addActionListener(e -> {
+            actionItem.removeAll();
+            actionItem.add(addObjectToTable);
+            actionItem.add(deleteItem);
+            deleteIndexItem = 0;
+            container.repaint();
+            container.revalidate();
+        });
+
         startOfProgram.addActionListener(e -> {
             container.removeAll();
+            typeAction = 0;
+            costProcess = 0;
+            weightProcess = 0;
+            itemsProcess = new ArrayList<>();
+            items = new ArrayList<>();
+
             mainWindow();
             container.repaint();
             container.revalidate();
@@ -151,8 +231,7 @@ public class GUI extends JFrame {
 
             gbc = new GridBagConstraints();
             JLabel labelInputTable = new JLabel("Исходные данные");
-            Font labelInputTableFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 16, labelInputTable.getFont());
-            if (labelInputTableFont != null) labelInputTable.setFont(labelInputTableFont);
+            labelInputTable.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
             gbc.gridx = 0;
             gbc.gridy = 0;
             gbc.insets = new Insets(10, 0, 10, 0);
@@ -170,8 +249,7 @@ public class GUI extends JFrame {
             ArrayList<Item> itemBefore = continuousBackpack.run();
             gbc = new GridBagConstraints();
             JLabel labelOutputTable = new JLabel("Результат работы алгоритма");
-            Font labelOutputTableFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 16, labelOutputTable.getFont());
-            if (labelOutputTableFont != null) labelOutputTable.setFont(labelInputTableFont);
+            labelOutputTable.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
             gbc.gridx = 0;
             gbc.gridy = 0;
             gbc.insets = new Insets(10, 0, 10, 0);
@@ -207,8 +285,7 @@ public class GUI extends JFrame {
             inputDataContainer.add(scrollPaneTableOutput, gbc);
 
             JLabel maxWeightLabel = new JLabel("Исходный вес рюкзака - " + inputMaxWeight.getText() + " кг.");
-            Font maxWeightFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 16, maxWeightLabel.getFont());
-            if (maxWeightFont != null) maxWeightLabel.setFont(maxWeightFont);
+            maxWeightLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 2;
@@ -221,8 +298,7 @@ public class GUI extends JFrame {
             inputDataContainer.add(Box.createVerticalStrut(5), gbc);
 
             JLabel weightBeforeLabel = new JLabel("Получившийся вес рюкзака - " + maxWeightBefore + " кг.");
-            Font weightBeforeLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 16, weightBeforeLabel.getFont());
-            if (weightBeforeLabelFont != null) weightBeforeLabel.setFont(weightBeforeLabelFont);
+            weightBeforeLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 4;
@@ -235,8 +311,7 @@ public class GUI extends JFrame {
             inputDataContainer.add(Box.createVerticalStrut(5), gbc);
 
             JLabel costBeforeLabel = new JLabel("Получившаяся стоимость рюкзака - " + maxCostBefore + " руб.");
-            Font costBeforeLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 16, costBeforeLabel.getFont());
-            if (costBeforeLabelFont != null) costBeforeLabel.setFont(costBeforeLabelFont);
+            costBeforeLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 6;
@@ -249,10 +324,8 @@ public class GUI extends JFrame {
 
             JPanel buttonsBlock = new JPanel();
             startOfProgram.setText("Начать заново");
-            aboutProject.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
-
             buttonsBlock.add(startOfProgram);
-            buttonsBlock.add(aboutProject);
+
             buttonsBlock.setBackground(Color.decode("#edfeff"));
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
@@ -268,6 +341,7 @@ public class GUI extends JFrame {
         ArrayList<Item> itemsAdded = new ArrayList<>();
         nextLevel.addActionListener(e -> {
             int weightBag = Integer.parseInt(inputMaxWeight.getText());
+            Item deleteItem = null;
             if (typeAction == 0) {
                 new ContinuousBackpack(weightBag, itemsProcess).sortItems();
                 DefaultTableModel model = (DefaultTableModel) tableSorted.getModel();
@@ -297,13 +371,21 @@ public class GUI extends JFrame {
                     }
 
                     weightBagProcess -= itemsProcess.get(0).getWeight();
+                    deleteItem = itemsProcess.get(0);
                     itemsProcess.remove(0);
-                    ;
                     model.addRow(new Object[]{costProcess, addedItems.toString(), weightProcess + "/" + weightBag});
                     typeAction += 1;
+                    stateStrTableProcess = 1;
+                }
+                else{
+                    deleteItem = itemsProcess.get(0);
+                    itemsProcess.remove(0);
+                    typeAction += 1;
+                    stateStrTableProcess = 0;
                 }
             }
-            if (itemsProcess.size() == 0 || itemsProcess.get(0).getWeight() > weightBagProcess) {
+
+            if (itemsProcess.size() == 0 || weightProcess > weightBagProcess) {
                 buttonsProcessBlock.removeAll();
                 GridBagConstraints gbc = new GridBagConstraints();
                 gbc.gridx = 0;
@@ -317,14 +399,24 @@ public class GUI extends JFrame {
             }
 
             String text;
-            if (itemsProcess.size() == 0 || itemsProcess.get(0).getWeight() > weightBagProcess) {
+
+            if (stateStrTableProcess == 0 && (itemsProcess.size() == 0 || weightProcess > weightBagProcess)) {
                 text = "<html><body style='width: 300px'>" +
-                        "<p>Максимальная стоимость рюкзака - " +
-                        "<b>" + costProcess + "</b>" + " руб." +
+                        "<p>Предмет <b>" + deleteItem.getName() + "</b> не помещается в рюкзак." +
+                        "Максимальная стоимость чемподана - " + "<b>" + costProcess + "</b>" + " руб." +
                         "<br/>Нажмите кнопку <b>Завершить</b>, чтобы получить полноценный результат программы.</p>" +
                         "</body></html>";
                 textInstruction.setText(text);
-            } else if (typeAction == 1) {
+            }
+            else if (stateStrTableProcess == 1 && (itemsProcess.size() == 1 || weightProcess > weightBagProcess)) {
+                text = "<html><body style='width: 300px'>" +
+                        "<p>Предмет <b>" + deleteItem.getName() + "</b> добавлен в рюкзак." +
+                        "Максимальная стоимость чемподана - " + "<b>" + costProcess + "</b>" + " руб." +
+                        "<br/>Нажмите кнопку <b>Завершить</b>, чтобы получить полноценный результат программы.</p>" +
+                        "</body></html>";
+                textInstruction.setText(text);
+            }
+            else if (typeAction == 1) {
                 text = "<html><body style='width: 300px'>" +
                         "<p>Отлично, данные готовы к обработке!" +
                         "<br/>Во второй таблице имеется три столбца: " +
@@ -334,9 +426,18 @@ public class GUI extends JFrame {
                         "<br/>Нажмите <b>«Следущий шаг»</b> для продолжения алгоритма.</p>" +
                         "</body></html>";
                 textInstruction.setText(text);
-            } else {
+            } else if (stateStrTableProcess == 0) {
                 text = "<html><body style='width: 300px'>" +
-                        "<p>Предметы постепенно добавляются в рюкзак. " +
+                        "<p>Предмет <b>" + deleteItem.getName() +"</b> не помещается в рюкзак."+
+                        "<br/>Процесс будет идти, пока вес предмета не превысит свободное место." +
+                        "<br/>Нажмите кнопку «Следущий шаг» для продолжения алгоритма " +
+                        "или нажмите «Завершить», чтобы получить итог.</p>" +
+                        "</body></html>";
+                textInstruction.setText(text);
+            }
+            else{
+                text = "<html><body style='width: 300px'>" +
+                        "<p>Предмет <b>" + deleteItem.getName() + "</b> добавлен в рюкзак."+
                         "<br/>Процесс будет идти, пока вес предмета не превысит свободное место." +
                         "<br/>Нажмите кнопку «Следущий шаг» для продолжения алгоритма " +
                         "или нажмите «Завершить», чтобы получить итог.</p>" +
@@ -368,8 +469,7 @@ public class GUI extends JFrame {
 
         gbc = new GridBagConstraints();
         JLabel labelTable = new JLabel("Исходные данные");
-        Font labelTableFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 16, labelTable.getFont());
-        if (labelTableFont != null) labelTable.setFont(labelTableFont);
+        labelTable.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(10, 0, 10, 0);
@@ -396,8 +496,7 @@ public class GUI extends JFrame {
         gbc.weighty = 0.4;
         gbc.fill = GridBagConstraints.CENTER;
 
-        Font textLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 15, tableInputLabel.getFont());
-        textInstruction.setFont(textLabelFont);
+        textInstruction.setFont(new Font("JetBrains Mono", Font.PLAIN, 15));
 
         inputDataContainer.add(textInstruction, gbc);
 
@@ -431,10 +530,8 @@ public class GUI extends JFrame {
                     item.getRatioWeightToPrice()}
                     );
         }
-
         JLabel tableRatioLabel = new JLabel("Таблица коэффициентов");
-        Font tableRatioFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 13, tableRatioLabel.getFont());
-        if (tableRatioFont != null) tableRatioLabel.setFont(tableRatioFont);
+        tableRatioLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 13));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -453,8 +550,7 @@ public class GUI extends JFrame {
         outputDataContainer.add(scrollSorted, gbc);
 
         JLabel tableProcessLabel = new JLabel("Таблица содержимого рюкзака");
-        Font tableProcessFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 13, tableProcessLabel.getFont());
-        if (tableProcessFont != null) tableProcessLabel.setFont(tableProcessFont);
+        tableProcessLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 13));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -485,11 +581,8 @@ public class GUI extends JFrame {
 
         buttonsProcessBlock = new JPanel();
         buttonsProcessBlock.setBackground(Color.decode("#edfeff"));
-        Font nextLevelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, -1, nextLevel.getFont());
-        if (nextLevelFont != null) nextLevel.setFont(nextLevelFont);
-
-        Font finishAlgorithmFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, -1, finishAlgorithm.getFont());
-        if (finishAlgorithmFont != null) finishAlgorithm.setFont(finishAlgorithmFont);
+        nextLevel.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
+        finishAlgorithm.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
 
         buttonsProcessBlock.add(nextLevel);
         buttonsProcessBlock.add(finishAlgorithm);
@@ -498,12 +591,10 @@ public class GUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.weightx = 1;
-
         outputDataContainer.add(buttonsProcessBlock, gbc);
 
         JLabel processLabel = new JLabel();
-        Font processLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 16, processLabel.getFont());
-        if (processLabelFont != null) processLabel.setFont(processLabelFont);
+        processLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
 
         processLabel.setText("Алгоритм заполнения рюкзака");
         processLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -518,7 +609,7 @@ public class GUI extends JFrame {
         container.revalidate();
     }
 
-    private void createUIComponents() {
+    private void mainWindow(){
         DefaultTableModel modelInputData = new DefaultTableModel();
         tableInputData = new JTable(modelInputData);
         modelInputData.addColumn("Название");
@@ -528,10 +619,6 @@ public class GUI extends JFrame {
         tableInputData.getTableHeader().setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
         tableInputData.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
         tableInputData.setDefaultRenderer(Object.class, new TableInfoRenderer());
-    }
-
-    private void mainWindow(){
-        createUIComponents();
 
         GridBagConstraints gbc;
         inputDataContainer = new JPanel();
@@ -570,8 +657,7 @@ public class GUI extends JFrame {
         gbc.insets = new Insets(10, 0, 0, 0);
         inputDataContainer.add(weightPanel, gbc);
 
-        Font resultButtonFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, -1, resultButton.getFont());
-        if (resultButtonFont != null) resultButton.setFont(resultButtonFont);
+        resultButton.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -580,8 +666,7 @@ public class GUI extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         weightPanel.add(resultButton, gbc);
         JLabel maxWeightLabel = new JLabel();
-        Font maxWeightLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 14, maxWeightLabel.getFont());
-        if (maxWeightLabelFont != null) maxWeightLabel.setFont(maxWeightLabelFont);
+        maxWeightLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
         maxWeightLabel.setText("Максимальный вес рюкзака (кг.)");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -610,32 +695,36 @@ public class GUI extends JFrame {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         inputDataContainer.add(formObject, gbc);
-        final JLabel label1 = new JLabel();
-        Font label1Font = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 16, label1.getFont());
-        if (label1Font != null) label1.setFont(label1Font);
-        label1.setText("Форма предмета");
-        label1.setVerticalAlignment(0);
+        JLabel formObjectLabel = new JLabel();
+        formObjectLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
+        formObjectLabel.setText("Форма предмета");
+        formObjectLabel.setVerticalAlignment(0);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        formObject.add(label1, gbc);
+        formObject.add(formObjectLabel, gbc);
 
-        Font addObjectToTableFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, -1, addObjectToTable.getFont());
-        if (addObjectToTableFont != null) addObjectToTable.setFont(addObjectToTableFont);
-        gbc = new GridBagConstraints();
+        actionItem = new JPanel();
+        actionItem.setBackground(Color.decode("#edfeff"));
+
+        addObjectToTable.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
+        deleteItem.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
+        actionItem.add(addObjectToTable);
+        actionItem.add(deleteItem);
+
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        formObject.add(addObjectToTable, gbc);
+        formObject.add(actionItem, gbc);
+
         JLabel nameObjectLabel = new JLabel();
-        Font nameObjectLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 14, nameObjectLabel.getFont());
-        if (nameObjectLabelFont != null) nameObjectLabel.setFont(nameObjectLabelFont);
+        nameObjectLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
         nameObjectLabel.setText("Название предмета");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -673,8 +762,7 @@ public class GUI extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         formObject.add(inputCostObject, gbc);
         JLabel weightObjectLabel = new JLabel();
-        Font weightObjectLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 14, weightObjectLabel.getFont());
-        if (weightObjectLabelFont != null) weightObjectLabel.setFont(weightObjectLabelFont);
+        weightObjectLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
         weightObjectLabel.setText("Вес предмета (кг.)");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -684,8 +772,7 @@ public class GUI extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         formObject.add(weightObjectLabel, gbc);
         JLabel costObjectLabel = new JLabel();
-        Font costObjectLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 14, costObjectLabel.getFont());
-        if (costObjectLabelFont != null) costObjectLabel.setFont(costObjectLabelFont);
+        costObjectLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
         costObjectLabel.setText("Цена предмета (руб.)");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -706,8 +793,7 @@ public class GUI extends JFrame {
         outputDataContainer.add(scrollPane1, gbc);
         scrollPane1.setViewportView(tableInputData);
         tableInputLabel = new JLabel();
-        Font tableInputLabelFont = this.$$$getFont$$$("JetBrains Mono", Font.PLAIN, 16, tableInputLabel.getFont());
-        if (tableInputLabelFont != null) tableInputLabel.setFont(tableInputLabelFont);
+        tableInputLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
         tableInputLabel.setText("Таблица всех предметов");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -754,39 +840,10 @@ public class GUI extends JFrame {
         container.add(startOfProgram, gridBagConstraints);
     }
 
-    private void $$$setupUI$$$() {
+    private void startGUI() {
         container = new JPanel();
         container.setLayout(new GridBagLayout());
         startWindow();
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
-        if (currentFont == null) return null;
-        String resultName;
-        if (fontName == null) {
-            resultName = currentFont.getName();
-        } else {
-            Font testFont = new Font(fontName, Font.PLAIN, 10);
-            if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
-                resultName = fontName;
-            } else {
-                resultName = currentFont.getName();
-            }
-        }
-        Font font = new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
-        boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
-        Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
-        return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    public JComponent $$$getRootComponent$$$() {
-        return container;
     }
 
 }
