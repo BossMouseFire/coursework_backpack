@@ -35,12 +35,7 @@ public class GUI extends JFrame {
     private final JButton backToAddPanel;
     private int deleteIndexItem;
     private int stateStrTableProcess;
-    public static void main(String[] args) {
-        GUI gui = new GUI();
-        gui.setSize(790, 400);
-        gui.setVisible(true);
-    }
-
+    private ArrayList<Item> itemsAdded = new ArrayList<>();
     public GUI() {
         super("Задача о рюкзаке (жадный алгоритм)");
         startGUI();
@@ -62,389 +57,283 @@ public class GUI extends JFrame {
         resultButton = new JButton("Получить результат");
         backToAddPanel = new JButton("Назад");
         backToAddPanel.setFont(new Font("JetBrains Mono", Font.PLAIN, 14));
-        addObjectToTable.addActionListener(e -> {
-            DefaultTableModel model = (DefaultTableModel) tableInputData.getModel();
 
-            if (!inputCostObject.getText().matches("[-+]?\\d+")) {
-                JOptionPane.showMessageDialog(
-                        null,
-                        "Поле «Цена предмета» должно иметь целое числовое значение",
-                        "Ошибка",
-                        JOptionPane.WARNING_MESSAGE);
-            } else if (!inputWeightObject.getText().matches("[-+]?\\d+")) {
-                JOptionPane.showMessageDialog(
-                        null,
-                        "Поле «Вес предмета» должно иметь целое числовое значение",
-                        "Ошибка",
-                        JOptionPane.WARNING_MESSAGE);
-            } else if (inputNameObject.getText().equals("")) {
-                JOptionPane.showMessageDialog(
-                        null,
-                        "Поле «Название предмета» не должно иметь пустое значение",
-                        "Ошибка",
-                        JOptionPane.WARNING_MESSAGE);
-            } else {
-                model.addRow(new Object[]{
-                        inputNameObject.getText(),
-                        inputCostObject.getText(),
-                        inputWeightObject.getText()});
-                items.add(
-                        new Item(inputNameObject.getText(),
-                                Integer.parseInt(inputCostObject.getText()),
-                                Integer.parseInt(inputWeightObject.getText()))
-                );
-            }
+        addObjectToTable.addActionListener(e -> {
+            setAddObjectToTable();
         });
         deleteItem.addActionListener(e -> {
-            DefaultTableModel model = (DefaultTableModel) tableInputData.getModel();
-            if(deleteIndexItem == 0){
-                actionItem.removeAll();
-                inputDeleteIndex = new JTextField("Введите индекс предмета");
-                actionItem.add(inputDeleteIndex);
-                actionItem.add(deleteItem);
-                actionItem.add(backToAddPanel);
-                container.repaint();
-                container.revalidate();
-                deleteIndexItem = 1;
-            }
-            else{
-                 if(items.size() == 0){
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Количество предметов в рюкзаке не должно быть равно нулю",
-                            "Ошибка",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-                else if(inputDeleteIndex.getText().equals("")){
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Поле с индексом предмета не должно быть пустым",
-                            "Ошибка",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-                else if(!inputDeleteIndex.getText().matches("[-+]?\\d+")){
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Поле с индексом предмета должно содержать целочисленное значение",
-                            "Ошибка",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-                else if(Integer.parseInt(inputDeleteIndex.getText()) < 0 ||
-                        Integer.parseInt(inputDeleteIndex.getText()) >= items.size()){
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Значение индекса должно находится в диапазоне количества предметов",
-                            "Ошибка",
-                            JOptionPane.WARNING_MESSAGE);
-                }
-                else{
-                    int indexDeletedItem = Integer.parseInt(inputDeleteIndex.getText());
-                    int input = JOptionPane.showConfirmDialog(null, "Вы действительно хотите удалить предмет?", "Выберите действие...",
-                            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-                    if (input == 0) {
-                        items.remove(indexDeletedItem);
-                        model.removeRow(indexDeletedItem);
-                        actionItem.removeAll();
-                        actionItem.add(addObjectToTable);
-                        actionItem.add(deleteItem);
-                        deleteIndexItem = 0;
-                        container.repaint();
-                        container.revalidate();
-                    }
-                }
-            }
+            setDeleteItem();
         });
         backToAddPanel.addActionListener(e -> {
-            actionItem.removeAll();
-            actionItem.add(addObjectToTable);
-            actionItem.add(deleteItem);
-            deleteIndexItem = 0;
-            container.repaint();
-            container.revalidate();
+            setBackToAddPanel();
         });
 
         startOfProgram.addActionListener(e -> {
-            container.removeAll();
-            typeAction = 0;
-            costProcess = 0;
-            weightProcess = 0;
-            itemsProcess = new ArrayList<>();
-            items = new ArrayList<>();
-
-            mainWindow();
-            container.repaint();
-            container.revalidate();
+            setStartOfProgram();
         });
         resultButton.addActionListener(e -> {
-            if (!inputMaxWeight.getText().matches("[-+]?\\d+")) {
-                JOptionPane.showMessageDialog(
-                        null,
-                        "Поле «Максимальный вес рюкзака» должно иметь целое числовое значение",
-                        "Ошибка",
-                        JOptionPane.WARNING_MESSAGE);
-            } else if (Integer.parseInt(inputMaxWeight.getText()) == 0) {
-                JOptionPane.showMessageDialog(
-                        null,
-                        "Поле «Максимальный вес рюкзака» не должно быть равно нулю",
-                        "Ошибка",
-                        JOptionPane.WARNING_MESSAGE);
-            } else if (items.size() == 0) {
+            setResultButton();
+        });
+        finishAlgorithm.addActionListener(e -> {
+            setFinishAlgorithm();
+        });
+
+        nextLevel.addActionListener(e -> {
+           setNextLevel();
+        });
+    }
+
+    private void setAddObjectToTable(){
+        DefaultTableModel model = (DefaultTableModel) tableInputData.getModel();
+
+        if (!inputCostObject.getText().matches("[-+]?\\d+")) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Поле «Цена предмета» должно иметь целое числовое значение",
+                    "Ошибка",
+                    JOptionPane.WARNING_MESSAGE);
+        } else if (!inputWeightObject.getText().matches("[-+]?\\d+")) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Поле «Вес предмета» должно иметь целое числовое значение",
+                    "Ошибка",
+                    JOptionPane.WARNING_MESSAGE);
+        } else if (inputNameObject.getText().equals("")) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Поле «Название предмета» не должно иметь пустое значение",
+                    "Ошибка",
+                    JOptionPane.WARNING_MESSAGE);
+        } else {
+            model.addRow(new Object[]{
+                    inputNameObject.getText(),
+                    inputCostObject.getText(),
+                    inputWeightObject.getText()});
+            items.add(
+                    new Item(inputNameObject.getText(),
+                            Integer.parseInt(inputCostObject.getText()),
+                            Integer.parseInt(inputWeightObject.getText()))
+            );
+        }
+    }
+    private void setDeleteItem(){
+        DefaultTableModel model = (DefaultTableModel) tableInputData.getModel();
+        if(deleteIndexItem == 0){
+            actionItem.removeAll();
+            inputDeleteIndex = new JTextField("Введите индекс предмета");
+            actionItem.add(inputDeleteIndex);
+            actionItem.add(deleteItem);
+            actionItem.add(backToAddPanel);
+            container.repaint();
+            container.revalidate();
+            deleteIndexItem = 1;
+        }
+        else{
+            if(items.size() == 0){
                 JOptionPane.showMessageDialog(
                         null,
                         "Количество предметов в рюкзаке не должно быть равно нулю",
                         "Ошибка",
                         JOptionPane.WARNING_MESSAGE);
-            } else {
-                weightBagProcess = Integer.parseInt(inputMaxWeight.getText());
-                itemsProcess = new ArrayList<>(items);
-                algorithmBlock();
-                createTableInput();
             }
-        });
-        finishAlgorithm.addActionListener(e -> {
-            inputDataContainer.removeAll();
-            outputDataContainer.removeAll();
-
-            ContinuousBackpack continuousBackpack = new ContinuousBackpack(
-                    Integer.parseInt(inputMaxWeight.getText()),
-                    items
-            );
-
-            GridBagConstraints gbc;
-            DefaultTableModel model;
-
-            model = new DefaultTableModel();
-            tableInputData = new JTable(model);
-            model.addColumn("Название");
-            model.addColumn("Цена (руб.)");
-            model.addColumn("Вес (кг.)");
-
-            tableInputData.getTableHeader().setFont(new Font("JetBrains Mono", Font.PLAIN, 11));
-            tableInputData.setFont(new Font("JetBrains Mono", Font.PLAIN, 11));
-            tableInputData.setDefaultRenderer(Object.class, new TableInfoRenderer());
-
-            for (Item item : items) {
-                model.addRow(new Object[]{item.getName(), item.getCost(), item.getWeight()});
+            else if(inputDeleteIndex.getText().equals("")){
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Поле с индексом предмета не должно быть пустым",
+                        "Ошибка",
+                        JOptionPane.WARNING_MESSAGE);
             }
-
-            JScrollPane scrollPaneTableInput = new JScrollPane(tableInputData);
-
-            gbc = new GridBagConstraints();
-            JLabel labelInputTable = new JLabel("Исходные данные");
-            labelInputTable.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            gbc.insets = new Insets(10, 0, 10, 0);
-            outputDataContainer.add(labelInputTable, gbc);
-
-            gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 1;
-            gbc.weightx = 1.0;
-            gbc.weighty = 1.0;
-            gbc.fill = GridBagConstraints.BOTH;
-            gbc.insets = new Insets(0, 0, 10, 0);
-            outputDataContainer.add(scrollPaneTableInput, gbc);
-
-            ArrayList<Item> itemBefore = continuousBackpack.run();
-            gbc = new GridBagConstraints();
-            JLabel labelOutputTable = new JLabel("Результат работы алгоритма");
-            labelOutputTable.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            gbc.insets = new Insets(10, 0, 10, 0);
-            inputDataContainer.add(labelOutputTable, gbc);
-            model = new DefaultTableModel();
-            JTable tableOutputData = new JTable(model);
-            model.addColumn("Название");
-            model.addColumn("Цена (руб.)");
-            model.addColumn("Вес (кг.)");
-
-            tableOutputData.getTableHeader().setFont(new Font("JetBrains Mono", Font.PLAIN, 11));
-            tableOutputData.setFont(new Font("JetBrains Mono", Font.PLAIN, 11));
-            tableOutputData.setDefaultRenderer(Object.class, new TableInfoRenderer());
-
-            int maxWeightBefore = 0;
-            int maxCostBefore = 0;
-            for (Item item : itemBefore) {
-                model.addRow(new Object[]{item.getName(), item.getCost(), item.getWeight()});
-                maxWeightBefore += item.getWeight();
-                maxCostBefore += item.getCost();
+            else if(!inputDeleteIndex.getText().matches("[-+]?\\d+")){
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Поле с индексом предмета должно содержать целочисленное значение",
+                        "Ошибка",
+                        JOptionPane.WARNING_MESSAGE);
             }
-
-            JScrollPane scrollPaneTableOutput = new JScrollPane(tableOutputData);
-
-            gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 1;
-            gbc.weightx = 1.0;
-            gbc.weighty = 0.5;
-            gbc.gridwidth = 2;
-            gbc.fill = GridBagConstraints.BOTH;
-            gbc.insets = new Insets(0, 0, 10, 0);
-            inputDataContainer.add(scrollPaneTableOutput, gbc);
-
-            JLabel maxWeightLabel = new JLabel("Исходный вес рюкзака - " + inputMaxWeight.getText() + " кг.");
-            maxWeightLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
-            gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 2;
-            gbc.weightx = 1.0;
-            gbc.gridwidth = 2;
-            gbc.fill = GridBagConstraints.BOTH;
-            inputDataContainer.add(maxWeightLabel, gbc);
-
-            gbc.gridy = 3;
-            inputDataContainer.add(Box.createVerticalStrut(5), gbc);
-
-            JLabel weightBeforeLabel = new JLabel("Получившийся вес рюкзака - " + maxWeightBefore + " кг.");
-            weightBeforeLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
-            gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 4;
-            gbc.weightx = 1.0;
-            gbc.gridwidth = 2;
-            gbc.fill = GridBagConstraints.BOTH;
-            inputDataContainer.add(weightBeforeLabel, gbc);
-
-            gbc.gridy = 5;
-            inputDataContainer.add(Box.createVerticalStrut(5), gbc);
-
-            JLabel costBeforeLabel = new JLabel("Получившаяся стоимость рюкзака - " + maxCostBefore + " руб.");
-            costBeforeLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
-            gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 6;
-            gbc.gridwidth = 2;
-            gbc.fill = GridBagConstraints.BOTH;
-            inputDataContainer.add(costBeforeLabel, gbc);
-
-            gbc.gridy = 7;
-            inputDataContainer.add(Box.createVerticalStrut(10), gbc);
-
-            JPanel buttonsBlock = new JPanel();
-            startOfProgram.setText("Начать заново");
-            buttonsBlock.add(startOfProgram);
-
-            buttonsBlock.setBackground(Color.decode("#edfeff"));
-            gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 8;
-            gbc.weightx = 1;
-            gbc.insets = new Insets(5, 0, 0, 0);
-            inputDataContainer.add(buttonsBlock, gbc);
-
-            container.repaint();
-            container.revalidate();
-        });
-
-        ArrayList<Item> itemsAdded = new ArrayList<>();
-        nextLevel.addActionListener(e -> {
-            int weightBag = Integer.parseInt(inputMaxWeight.getText());
-            Item deleteItem = null;
-            if (typeAction == 0) {
-                new ContinuousBackpack(weightBag, itemsProcess).sortItems();
-                DefaultTableModel model = (DefaultTableModel) tableSorted.getModel();
-                while (tableSorted.getRowCount() != 0) {
-                    model.removeRow(0);
-                }
-                for (Item item : itemsProcess) {
-                    model.addRow(new Object[]{
-                            item.getName(),
-                            item.getCost(),
-                            item.getWeight(),
-                            item.getRatioWeightToPrice()}
-                    );
-                }
-                typeAction += 1;
-            } else {
-                if (itemsProcess.get(0).getWeight() <= weightBagProcess) {
-                    DefaultTableModel model = (DefaultTableModel) tableProcess.getModel();
-                    StringBuilder addedItems = new StringBuilder();
-                    costProcess += itemsProcess.get(0).getCost();
-                    weightProcess += itemsProcess.get(0).getWeight();
-
-                    itemsAdded.add(itemsProcess.get(0));
-
-                    for (Item item : itemsAdded) {
-                        addedItems.append(item.getName()).append(";");
-                    }
-
-                    weightBagProcess -= itemsProcess.get(0).getWeight();
-                    deleteItem = itemsProcess.get(0);
-                    itemsProcess.remove(0);
-                    model.addRow(new Object[]{costProcess, addedItems.toString(), weightProcess + "/" + weightBag});
-                    typeAction += 1;
-                    stateStrTableProcess = 1;
-                }
-                else{
-                    deleteItem = itemsProcess.get(0);
-                    itemsProcess.remove(0);
-                    typeAction += 1;
-                    stateStrTableProcess = 0;
-                }
-            }
-
-            if (itemsProcess.size() == 0 || weightProcess > weightBagProcess) {
-                buttonsProcessBlock.removeAll();
-                GridBagConstraints gbc = new GridBagConstraints();
-                gbc.gridx = 0;
-                gbc.gridy = 2;
-                gbc.weightx = 1;
-                buttonsProcessBlock.add(finishAlgorithm, gbc);
-                tableProcess.setDefaultRenderer(
-                        Object.class,
-                        new TableInfoRenderer()
-                );
-            }
-
-            String text;
-
-            if (stateStrTableProcess == 0 && (itemsProcess.size() == 0 || weightProcess > weightBagProcess)) {
-                text = "<html><body style='width: 300px'>" +
-                        "<p>Предмет <b>" + deleteItem.getName() + "</b> не помещается в рюкзак." +
-                        "Максимальная стоимость чемподана - " + "<b>" + costProcess + "</b>" + " руб." +
-                        "<br/>Нажмите кнопку <b>Завершить</b>, чтобы получить полноценный результат программы.</p>" +
-                        "</body></html>";
-                textInstruction.setText(text);
-            }
-            else if (stateStrTableProcess == 1 && (itemsProcess.size() == 1 || weightProcess > weightBagProcess)) {
-                text = "<html><body style='width: 300px'>" +
-                        "<p>Предмет <b>" + deleteItem.getName() + "</b> добавлен в рюкзак." +
-                        "Максимальная стоимость чемподана - " + "<b>" + costProcess + "</b>" + " руб." +
-                        "<br/>Нажмите кнопку <b>Завершить</b>, чтобы получить полноценный результат программы.</p>" +
-                        "</body></html>";
-                textInstruction.setText(text);
-            }
-            else if (typeAction == 1) {
-                text = "<html><body style='width: 300px'>" +
-                        "<p>Отлично, данные готовы к обработке!" +
-                        "<br/>Во второй таблице имеется три столбца: " +
-                        "<br/><b>Цена</b> - показывает текущую стоимость рюкзака" +
-                        "<br/><b>Предметы</b> - текущие предметы в рюкзаке" +
-                        "<br/><b>Вес</b> - текущую заполненность рюкзака" +
-                        "<br/>Нажмите <b>«Следущий шаг»</b> для продолжения алгоритма.</p>" +
-                        "</body></html>";
-                textInstruction.setText(text);
-            } else if (stateStrTableProcess == 0) {
-                text = "<html><body style='width: 300px'>" +
-                        "<p>Предмет <b>" + deleteItem.getName() +"</b> не помещается в рюкзак."+
-                        "<br/>Процесс будет идти, пока вес предмета не превысит свободное место." +
-                        "<br/>Нажмите кнопку «Следущий шаг» для продолжения алгоритма " +
-                        "или нажмите «Завершить», чтобы получить итог.</p>" +
-                        "</body></html>";
-                textInstruction.setText(text);
+            else if(Integer.parseInt(inputDeleteIndex.getText()) < 0 ||
+                    Integer.parseInt(inputDeleteIndex.getText()) >= items.size()){
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Значение индекса должно находится в диапазоне количества предметов",
+                        "Ошибка",
+                        JOptionPane.WARNING_MESSAGE);
             }
             else{
-                text = "<html><body style='width: 300px'>" +
-                        "<p>Предмет <b>" + deleteItem.getName() + "</b> добавлен в рюкзак."+
-                        "<br/>Процесс будет идти, пока вес предмета не превысит свободное место." +
-                        "<br/>Нажмите кнопку «Следущий шаг» для продолжения алгоритма " +
-                        "или нажмите «Завершить», чтобы получить итог.</p>" +
-                        "</body></html>";
-                textInstruction.setText(text);
+                int indexDeletedItem = Integer.parseInt(inputDeleteIndex.getText());
+                int input = JOptionPane.showConfirmDialog(null, "Вы действительно хотите удалить предмет?", "Выберите действие...",
+                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (input == 0) {
+                    items.remove(indexDeletedItem);
+                    model.removeRow(indexDeletedItem);
+                    actionItem.removeAll();
+                    actionItem.add(addObjectToTable);
+                    actionItem.add(deleteItem);
+                    deleteIndexItem = 0;
+                    container.repaint();
+                    container.revalidate();
+                }
             }
-        });
+        }
+    }
+    private void setBackToAddPanel(){
+        actionItem.removeAll();
+        actionItem.add(addObjectToTable);
+        actionItem.add(deleteItem);
+        deleteIndexItem = 0;
+        container.repaint();
+        container.revalidate();
+    }
+    private void setStartOfProgram(){
+        container.removeAll();
+        typeAction = 0;
+        costProcess = 0;
+        weightProcess = 0;
+        itemsProcess = new ArrayList<>();
+        items = new ArrayList<>();
+        itemsAdded = new ArrayList<>();
+        mainWindow();
+        container.repaint();
+        container.revalidate();
+    }
+    private void setResultButton(){
+        if (!inputMaxWeight.getText().matches("[-+]?\\d+")) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Поле «Максимальный вес рюкзака» должно иметь целое числовое значение",
+                    "Ошибка",
+                    JOptionPane.WARNING_MESSAGE);
+        } else if (Integer.parseInt(inputMaxWeight.getText()) == 0) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Поле «Максимальный вес рюкзака» не должно быть равно нулю",
+                    "Ошибка",
+                    JOptionPane.WARNING_MESSAGE);
+        } else if (items.size() == 0) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Количество предметов в рюкзаке не должно быть равно нулю",
+                    "Ошибка",
+                    JOptionPane.WARNING_MESSAGE);
+        } else {
+            weightBagProcess = Integer.parseInt(inputMaxWeight.getText());
+            itemsProcess = new ArrayList<>(items);
+            algorithmBlock();
+            createTableInput();
+        }
+    }
+    private void setFinishAlgorithm(){
+        ContinuousBackpack continuousBackpack = new ContinuousBackpack(
+                Integer.parseInt(inputMaxWeight.getText()),
+                items
+        );
+        ArrayList<Item> itemBefore = continuousBackpack.run();
+        finishWindow(itemBefore);
+
+    }
+    private void setNextLevel(){
+        int weightBag = Integer.parseInt(inputMaxWeight.getText());
+        Item deleteItem = null;
+        if (typeAction == 0) {
+            new ContinuousBackpack(weightBag, itemsProcess).sortItems();
+            DefaultTableModel model = (DefaultTableModel) tableSorted.getModel();
+            while (tableSorted.getRowCount() != 0) {
+                model.removeRow(0);
+            }
+            for (Item item : itemsProcess) {
+                model.addRow(new Object[]{
+                        item.getName(),
+                        item.getCost(),
+                        item.getWeight(),
+                        item.getRatioWeightToPrice()}
+                );
+            }
+            typeAction += 1;
+        } else {
+            if (itemsProcess.get(0).getWeight() <= weightBagProcess) {
+                DefaultTableModel model = (DefaultTableModel) tableProcess.getModel();
+                StringBuilder addedItems = new StringBuilder();
+                costProcess += itemsProcess.get(0).getCost();
+                weightProcess += itemsProcess.get(0).getWeight();
+                itemsAdded.add(itemsProcess.get(0));
+
+                for (Item item : itemsAdded) {
+                    addedItems.append(item.getName()).append(";");
+                }
+
+                weightBagProcess -= itemsProcess.get(0).getWeight();
+                deleteItem = itemsProcess.get(0);
+                itemsProcess.remove(0);
+                model.addRow(new Object[]{costProcess, addedItems.toString(), weightProcess + "/" + weightBag});
+                typeAction += 1;
+                stateStrTableProcess = 1;
+            }
+            else{
+                deleteItem = itemsProcess.get(0);
+                itemsProcess.remove(0);
+                typeAction += 1;
+                stateStrTableProcess = 0;
+            }
+        }
+
+        if (itemsProcess.size() == 0 || weightProcess == weightBag) {
+            buttonsProcessBlock.removeAll();
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            gbc.weightx = 1;
+            buttonsProcessBlock.add(finishAlgorithm, gbc);
+            tableProcess.setDefaultRenderer(
+                    Object.class,
+                    new TableInfoRenderer()
+            );
+        }
+
+        String text;
+
+        if (stateStrTableProcess == 0 && (itemsProcess.size() == 0 || weightProcess == weightBag)) {
+            text = "<html><body style='width: 300px'>" +
+                    "<p>Предмет <b>" + deleteItem.getName() + "</b> не помещается в рюкзак." +
+                    "Максимальная стоимость чемподана - " + "<b>" + costProcess + "</b>" + " руб." +
+                    "<br/>Нажмите кнопку <b>Завершить</b>, чтобы получить полноценный результат программы.</p>" +
+                    "</body></html>";
+            textInstruction.setText(text);
+        }
+        else if (stateStrTableProcess == 1 && (itemsProcess.size() == 0 || weightProcess == weightBag)) {
+            text = "<html><body style='width: 300px'>" +
+                    "<p>Предмет <b>" + deleteItem.getName() + "</b> добавлен в рюкзак." +
+                    "Максимальная стоимость чемподана - " + "<b>" + costProcess + "</b>" + " руб." +
+                    "<br/>Нажмите кнопку <b>Завершить</b>, чтобы получить полноценный результат программы.</p>" +
+                    "</body></html>";
+            textInstruction.setText(text);
+        }
+        else if (typeAction == 1) {
+            text = "<html><body style='width: 300px'>" +
+                    "<p>Отлично, данные готовы к обработке!" +
+                    "<br/>Во второй таблице имеется три столбца: " +
+                    "<br/><b>Цена</b> - показывает текущую стоимость рюкзака" +
+                    "<br/><b>Предметы</b> - текущие предметы в рюкзаке" +
+                    "<br/><b>Вес</b> - текущую заполненность рюкзака" +
+                    "<br/>Нажмите <b>«Следущий шаг»</b> для продолжения алгоритма.</p>" +
+                    "</body></html>";
+            textInstruction.setText(text);
+        } else if (stateStrTableProcess == 0) {
+            text = "<html><body style='width: 300px'>" +
+                    "<p>Предмет <b>" + deleteItem.getName() +"</b> не помещается в рюкзак."+
+                    "<br/>Процесс будет идти, пока вес предмета не превысит свободное место." +
+                    "<br/>Нажмите кнопку «Следущий шаг» для продолжения алгоритма " +
+                    "или нажмите «Завершить», чтобы получить итог.</p>" +
+                    "</body></html>";
+            textInstruction.setText(text);
+        }
+        else{
+            text = "<html><body style='width: 300px'>" +
+                    "<p>Предмет <b>" + deleteItem.getName() + "</b> добавлен в рюкзак."+
+                    "<br/>Процесс будет идти, пока вес предмета не превысит свободное место." +
+                    "<br/>Нажмите кнопку «Следущий шаг» для продолжения алгоритма " +
+                    "или нажмите «Завершить», чтобы получить итог.</p>" +
+                    "</body></html>";
+            textInstruction.setText(text);
+        }
     }
 
     private void createTableInput() {
@@ -828,18 +717,147 @@ public class GUI extends JFrame {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.CENTER;
-        gridBagConstraints.insets = new Insets(0, 0, 10, 0);
+        gridBagConstraints.insets = new Insets(0, 0, 30, 0);
         container.add(description, gridBagConstraints);
 
         startOfProgram = new JButton("Начать");
-        startOfProgram.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
+        startOfProgram.setFont(new Font("JetBrains Mono", Font.PLAIN, 20));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = GridBagConstraints.CENTER;
         container.add(startOfProgram, gridBagConstraints);
     }
+    private void finishWindow(ArrayList<Item> itemBefore){
+        inputDataContainer.removeAll();
+        outputDataContainer.removeAll();
+        GridBagConstraints gbc;
+        DefaultTableModel model;
 
+        model = new DefaultTableModel();
+        tableInputData = new JTable(model);
+        model.addColumn("Название");
+        model.addColumn("Цена (руб.)");
+        model.addColumn("Вес (кг.)");
+
+        tableInputData.getTableHeader().setFont(new Font("JetBrains Mono", Font.PLAIN, 11));
+        tableInputData.setFont(new Font("JetBrains Mono", Font.PLAIN, 11));
+        tableInputData.setDefaultRenderer(Object.class, new TableInfoRenderer());
+
+        for (Item item : items) {
+            model.addRow(new Object[]{item.getName(), item.getCost(), item.getWeight()});
+        }
+
+        JScrollPane scrollPaneTableInput = new JScrollPane(tableInputData);
+
+        gbc = new GridBagConstraints();
+        JLabel labelInputTable = new JLabel("Исходные данные");
+        labelInputTable.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(10, 0, 10, 0);
+        outputDataContainer.add(labelInputTable, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 0, 10, 0);
+        outputDataContainer.add(scrollPaneTableInput, gbc);
+
+        gbc = new GridBagConstraints();
+        JLabel labelOutputTable = new JLabel("Результат работы алгоритма");
+        labelOutputTable.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(10, 0, 10, 0);
+        inputDataContainer.add(labelOutputTable, gbc);
+        model = new DefaultTableModel();
+        JTable tableOutputData = new JTable(model);
+        model.addColumn("Название");
+        model.addColumn("Цена (руб.)");
+        model.addColumn("Вес (кг.)");
+
+        tableOutputData.getTableHeader().setFont(new Font("JetBrains Mono", Font.PLAIN, 11));
+        tableOutputData.setFont(new Font("JetBrains Mono", Font.PLAIN, 11));
+        tableOutputData.setDefaultRenderer(Object.class, new TableInfoRenderer());
+
+        int maxWeightBefore = 0;
+        int maxCostBefore = 0;
+        for (Item item : itemBefore) {
+            model.addRow(new Object[]{item.getName(), item.getCost(), item.getWeight()});
+            maxWeightBefore += item.getWeight();
+            maxCostBefore += item.getCost();
+        }
+
+        JScrollPane scrollPaneTableOutput = new JScrollPane(tableOutputData);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.5;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 0, 10, 0);
+        inputDataContainer.add(scrollPaneTableOutput, gbc);
+
+        JLabel maxWeightLabel = new JLabel("Исходный вес рюкзака - " + inputMaxWeight.getText() + " кг.");
+        maxWeightLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 1.0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        inputDataContainer.add(maxWeightLabel, gbc);
+
+        gbc.gridy = 3;
+        inputDataContainer.add(Box.createVerticalStrut(5), gbc);
+
+        JLabel weightBeforeLabel = new JLabel("Получившийся вес рюкзака - " + maxWeightBefore + " кг.");
+        weightBeforeLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.weightx = 1.0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        inputDataContainer.add(weightBeforeLabel, gbc);
+
+        gbc.gridy = 5;
+        inputDataContainer.add(Box.createVerticalStrut(5), gbc);
+
+        JLabel costBeforeLabel = new JLabel("Получившаяся стоимость рюкзака - " + maxCostBefore + " руб.");
+        costBeforeLabel.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        inputDataContainer.add(costBeforeLabel, gbc);
+
+        gbc.gridy = 7;
+        inputDataContainer.add(Box.createVerticalStrut(10), gbc);
+
+        JPanel buttonsBlock = new JPanel();
+        startOfProgram.setText("Начать заново");
+        startOfProgram.setFont(new Font("JetBrains Mono", Font.PLAIN, 16));
+        buttonsBlock.add(startOfProgram);
+
+        buttonsBlock.setBackground(Color.decode("#edfeff"));
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        gbc.weightx = 1;
+        gbc.insets = new Insets(5, 0, 0, 0);
+        inputDataContainer.add(buttonsBlock, gbc);
+
+        container.repaint();
+        container.revalidate();
+    }
     private void startGUI() {
         container = new JPanel();
         container.setLayout(new GridBagLayout());
