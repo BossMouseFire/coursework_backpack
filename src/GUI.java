@@ -86,16 +86,16 @@ public class GUI extends JFrame {
     private void setAddObjectToTable(){
         DefaultTableModel model = (DefaultTableModel) tableInputData.getModel();
 
-        if (!inputCostObject.getText().matches("[-+]?\\d+")) {
+        if (!inputCostObject.getText().matches("[-+]?\\d+") || Integer.parseInt(inputCostObject.getText()) <= 0) {
             JOptionPane.showMessageDialog(
                     null,
-                    "Поле «Цена предмета» должно иметь целое числовое значение",
+                    "Поле «Цена предмета» должно иметь целое положительное числовое значение",
                     "Ошибка",
                     JOptionPane.WARNING_MESSAGE);
-        } else if (!inputWeightObject.getText().matches("[-+]?\\d+")) {
+        } else if (!inputWeightObject.getText().matches("[-+]?\\d+") || Integer.parseInt(inputWeightObject.getText()) <= 0) {
             JOptionPane.showMessageDialog(
                     null,
-                    "Поле «Вес предмета» должно иметь целое числовое значение",
+                    "Поле «Вес предмета» должно иметь целое положительное числовое значение",
                     "Ошибка",
                     JOptionPane.WARNING_MESSAGE);
         } else if (inputNameObject.getText().equals("")) {
@@ -202,10 +202,10 @@ public class GUI extends JFrame {
                     "Поле «Максимальный вес рюкзака» должно иметь целое числовое значение",
                     "Ошибка",
                     JOptionPane.WARNING_MESSAGE);
-        } else if (Integer.parseInt(inputMaxWeight.getText()) == 0) {
+        } else if (Integer.parseInt(inputMaxWeight.getText()) <= 0) {
             JOptionPane.showMessageDialog(
                     null,
-                    "Поле «Максимальный вес рюкзака» не должно быть равно нулю",
+                    "Поле «Максимальный вес рюкзака» не должно быть равно меньше или равен нулю",
                     "Ошибка",
                     JOptionPane.WARNING_MESSAGE);
         } else if (items.size() == 0) {
